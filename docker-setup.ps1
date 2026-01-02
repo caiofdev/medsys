@@ -1,68 +1,68 @@
-# Script de configuração inicial do Docker para MedSys
+# Docker initial setup script for MedSys
 
-Write-Host "🐳 Configurando ambiente Docker para MedSys..." -ForegroundColor Cyan
+Write-Host "🐳 Configuring Docker environment for MedSys..." -ForegroundColor Cyan
 
-# Verificar se Docker está instalado
+# Check if Docker is installed
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ Docker não está instalado. Instale o Docker Desktop primeiro." -ForegroundColor Red
+    Write-Host "❌ Docker is not installed. Please install Docker Desktop first." -ForegroundColor Red
     Write-Host "Download: https://www.docker.com/products/docker-desktop" -ForegroundColor Yellow
     exit 1
 }
 
-Write-Host "✅ Docker detectado" -ForegroundColor Green
+Write-Host "✅ Docker detected" -ForegroundColor Green
 
-# Verificar se .env existe
+# Check if .env exists
 if (-not (Test-Path ".env")) {
-    Write-Host "📝 Criando arquivo .env..." -ForegroundColor Yellow
+    Write-Host "📝 Creating .env file..." -ForegroundColor Yellow
     Copy-Item ".env.example" ".env"
 }
 
-# Atualizar configurações do .env para Docker
-Write-Host "🔧 Atualizando configurações do .env para Docker..." -ForegroundColor Yellow
+# Update .env settings for Docker
+Write-Host "🔧 Updating .env settings for Docker..." -ForegroundColor Yellow
 
 $envContent = Get-Content ".env" -Raw
 $envContent = $envContent -replace "DB_HOST=127.0.0.1", "DB_HOST=db"
 $envContent = $envContent -replace "DB_PORT=3306", "DB_PORT=3306"
 Set-Content ".env" $envContent
 
-Write-Host "✅ Arquivo .env configurado" -ForegroundColor Green
+Write-Host "✅ .env file configured" -ForegroundColor Green
 
-# Build dos containers
-Write-Host "🏗️  Construindo containers Docker..." -ForegroundColor Cyan
+# Build containers
+Write-Host "🏗️  Building Docker containers..." -ForegroundColor Cyan
 docker-compose build
 
-# Iniciar containers
-Write-Host "🚀 Iniciando containers..." -ForegroundColor Cyan
+# Start containers
+Write-Host "🚀 Starting containers..." -ForegroundColor Cyan
 docker-compose up -d
 
-# Aguardar MySQL inicializar
-Write-Host "⏳ Aguardando MySQL inicializar..." -ForegroundColor Yellow
+# Wait for MySQL to initialize
+Write-Host "⏳ Waiting for MySQL to initialize..." -ForegroundColor Yellow
 Start-Sleep -Seconds 10
 
-# Instalar dependências do Composer
-Write-Host "📦 Instalando dependências do Composer..." -ForegroundColor Cyan
+# Install Composer dependencies
+Write-Host "📦 Installing Composer dependencies..." -ForegroundColor Cyan
 docker-compose exec -T app composer install
 
-# Gerar chave da aplicação
-Write-Host "🔑 Gerando chave da aplicação..." -ForegroundColor Cyan
+# Generate application key
+Write-Host "🔑 Generating application key..." -ForegroundColor Cyan
 docker-compose exec -T app php artisan key:generate
 
-# Executar migrations
-Write-Host "🗃️  Executando migrations..." -ForegroundColor Cyan
+# Run migrations
+Write-Host "🗃️  Running migrations..." -ForegroundColor Cyan
 docker-compose exec -T app php artisan migrate --force
 
-# Executar seeders
-Write-Host "🌱 Populando banco de dados..." -ForegroundColor Cyan
+# Run seeders
+Write-Host "🌱 Seeding database..." -ForegroundColor Cyan
 docker-compose exec -T app php artisan db:seed --force
 
 Write-Host ""
-Write-Host "✅ Configuração concluída com sucesso!" -ForegroundColor Green
+Write-Host "✅ Setup completed successfully!" -ForegroundColor Green
 Write-Host ""
-Write-Host "📍 Acesse a aplicação em: http://localhost:8000" -ForegroundColor Cyan
+Write-Host "📍 Access the application at: http://localhost:8000" -ForegroundColor Cyan
 Write-Host "📍 Vite dev server: http://localhost:5173" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Comandos úteis:" -ForegroundColor Yellow
-Write-Host "  docker-compose up -d       # Iniciar containers" -ForegroundColor White
-Write-Host "  docker-compose down        # Parar containers" -ForegroundColor White
-Write-Host "  docker-compose logs -f     # Ver logs" -ForegroundColor White
-Write-Host "  docker-compose exec app php artisan [comando]  # Executar artisan" -ForegroundColor White
+Write-Host "Useful commands:" -ForegroundColor Yellow
+Write-Host "  docker-compose up -d       # Start containers" -ForegroundColor White
+Write-Host "  docker-compose down        # Stop containers" -ForegroundColor White
+Write-Host "  docker-compose logs -f     # View logs" -ForegroundColor White
+Write-Host "  docker-compose exec app php artisan [command]  # Execute artisan" -ForegroundColor White

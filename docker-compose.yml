@@ -1,5 +1,5 @@
 services:
-  # Aplicação Laravel
+  # Laravel Application
   app:
     build:
       context: .
@@ -14,7 +14,7 @@ services:
     depends_on:
       - db
 
-  # Nginx
+  # Nginx Web Server
   nginx:
     image: nginx:alpine
     container_name: medsys-nginx
@@ -44,7 +44,7 @@ services:
     networks:
       - medsys-network
 
-  # Node.js para Vite
+  # Node.js for Vite
   node:
     image: node:22-alpine
     container_name: medsys-node

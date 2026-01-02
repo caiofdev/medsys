@@ -1,10 +1,10 @@
 FROM php:8.5-fpm
 
-# Argumentos
+# Arguments
 ARG user=medsys
 ARG uid=1000
 
-# Instalar dependências do sistema
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -17,29 +17,29 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm
 
-# Limpar cache
+# Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalar extensões PHP
+# Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Obter o Composer mais recente
+# Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Criar usuário do sistema para rodar comandos do Composer e Artisan
+# Create system user to run Composer and Artisan Commands
 RUN useradd -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
 
-# Definir diretório de trabalho
+# Set working directory
 WORKDIR /var/www
 
-# Copiar arquivos do projeto
+# Copy project files
 COPY --chown=$user:$user . /var/www
 
-# Mudar para o usuário criado
+# Switch to created user
 USER $user
 
-# Expor porta 9000 e iniciar PHP-FPM
+# Expose port 9000 and start PHP-FPM
 EXPOSE 9000
 CMD ["php-fpm"]
