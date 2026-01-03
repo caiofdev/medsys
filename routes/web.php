@@ -28,29 +28,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             
         Route::get('dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 
-        Route::controller(AdminController::class)->prefix('admins')->name('admins.')->group(function () {
-            Route::get('/', 'index')->name('index'); 
-            Route::post('/', 'store')->name('store');
-            Route::get('/{admin}', 'show')->name('show');
-            Route::put('/{admin}', 'update')->name('update');
-            Route::delete('/{admin}', 'destroy')->name('destroy');
-        });
+        Route::apiResource('admins', AdminController::class);
 
-        Route::controller(DoctorController::class)->prefix('doctors')->name('doctors.')->group(function () {
-            Route::get('/', 'index')->name('index');      
-            Route::post('/', 'store')->name('store');
-            Route::get('/{doctor}', 'show')->name('show');
-            Route::put('/{doctor}', 'update')->name('update');
-            Route::delete('/{doctor}', 'destroy')->name('destroy');
-        });
+        Route::apiResource('doctors', DoctorController::class);
 
-        Route::controller(ReceptionistController::class)->prefix('receptionists')->name('receptionists.')->group(function () {
-            Route::get('/', 'index')->name('index');      
-            Route::post('/', 'store')->name('store');
-            Route::get('/{receptionist}', 'show')->name('show');
-            Route::put('/{receptionist}', 'update')->name('update');
-            Route::delete('/{receptionist}', 'destroy')->name('destroy');
-        });
+        Route::apiResource('receptionists', ReceptionistController::class);
 
         Route::controller(DashboardController::class)->prefix('reports')->name('reports.')->group(function () {
             Route::get('last-consultations', 'getLastFiveCompletedConsultationsApi')->name('last-consultations');
