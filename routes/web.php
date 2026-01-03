@@ -49,13 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('dashboard', [DashboardController::class, 'receptionistDashboard'])->name('dashboard');
         Route::get('consultations-list', [DashboardController::class, 'consultationsList'])->name('consultations-list');
 
-        Route::controller(PatientController::class)->prefix('patients')->name('patient.')->group(function () {
-            Route::get('{patient}', 'show')->name('show');
-            Route::post('/', 'store')->name('store');
-            Route::put('{patient}', 'update')->name('update');
-            Route::delete('{patient}', 'destroy')->name('destroy');
-            Route::get('/', 'index')->name('table');
-        });
+        Route::apiResource('patients', PatientController::class);
 
         Route::controller(AppointmentController::class)->prefix('appointments')->name('appointment.')->group(function () {
             Route::post('/', 'store')->name('store');
