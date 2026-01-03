@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Doctor;
-use App\Models\User;
+use App\Domain\Models\Doctor;
+use App\Domain\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -142,14 +142,14 @@ class DoctorController extends Controller
             return redirect()->route('doctor.dashboard')->withErrors(['message' => 'Acesso negado.']);
         }
 
-        $appointments = \App\Models\Appointment::with(['patient'])
+        $appointments = \App\Domain\Models\Appointment::with(['patient'])
             ->where('doctor_id', $doctor->id)
             ->where('status', 'scheduled')
             ->whereDate('appointment_date', '>=', now()->toDateString())
             ->orderBy('appointment_date', 'asc')
             ->get();
 
-        $patients = \App\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
+        $patients = \App\Domain\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
             $query->where('doctor_id', $doctor->id);
         })
         ->select('id', 'name', 'email', 'cpf', 'phone', 'birth_date', 'gender', 'emergency_contact', 'medical_history')
@@ -186,7 +186,7 @@ class DoctorController extends Controller
             }
 
             // Verificar se o appointment pertence ao médico logado
-            $appointment = \App\Models\Appointment::where('id', $validated['appointment_id'])
+            $appointment = \App\Domain\Models\Appointment::where('id', $validated['appointment_id'])
                 ->where('doctor_id', $doctor->id)
                 ->first();
 
@@ -195,7 +195,7 @@ class DoctorController extends Controller
             }
 
             // Criar a consulta
-            $consultation = \App\Models\Consultation::create([
+            $consultation = \App\Domain\Models\Consultation::create([
                 'appointment_id' => $appointment->id,
                 'symptoms' => $validated['symptoms'],
                 'diagnosis' => $validated['diagnosis'],
@@ -224,7 +224,7 @@ class DoctorController extends Controller
         }
 
         // Buscar pacientes que já tiveram consultas com este médico
-        $patients = \App\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
+        $patients = \App\Domain\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
             $query->where('doctor_id', $doctor->id)
                   ->where('status', 'completed');
         })
@@ -238,7 +238,7 @@ class DoctorController extends Controller
         ->get();
 
         // Buscar todas as consultas concluídas deste médico
-        $consultationData = \App\Models\Consultation::whereHas('appointment', function ($query) use ($doctor) {
+        $consultationData = \App\Domain\Models\Consultation::whereHas('appointment', function ($query) use ($doctor) {
             $query->where('doctor_id', $doctor->id)
                   ->where('status', 'completed');
         })
@@ -264,7 +264,7 @@ class DoctorController extends Controller
         }
 
         // Verificar se o paciente teve consultas com este médico
-        $patient = \App\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
+        $patient = \App\Domain\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
             $query->where('doctor_id', $doctor->id)
                   ->where('status', 'completed');
         })
@@ -276,7 +276,7 @@ class DoctorController extends Controller
         }
 
         // Buscar todas as consultas deste paciente com este médico
-        $consultations = \App\Models\Consultation::whereHas('appointment', function ($query) use ($doctor, $patientId) {
+        $consultations = \App\Domain\Models\Consultation::whereHas('appointment', function ($query) use ($doctor, $patientId) {
             $query->where('doctor_id', $doctor->id)
                   ->where('patient_id', $patientId)
                   ->where('status', 'completed');

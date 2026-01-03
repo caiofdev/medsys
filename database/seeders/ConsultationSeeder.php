@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Consultation;
+use App\Domain\Models\Consultation;
 use Illuminate\Database\Seeder;
 
 class ConsultationSeeder extends Seeder

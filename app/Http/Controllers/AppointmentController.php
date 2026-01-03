@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
-use App\Models\Doctor;
-use App\Models\Patient;
+use App\Domain\Models\Appointment;
+use App\Domain\Models\Doctor;
+use App\Domain\Models\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;

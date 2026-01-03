@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Receptionist;
-use App\Models\User;
+use App\Domain\Models\Receptionist;
+use App\Domain\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

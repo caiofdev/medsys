@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Admin;
-use App\Models\User;
+use App\Domain\Models\Admin;
+use App\Domain\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

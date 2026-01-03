@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Receptionist;
+use App\Domain\Models\Receptionist;
 use Illuminate\Database\Seeder;
 
 class ReceptionistSeeder extends Seeder

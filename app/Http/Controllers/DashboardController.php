@@ -60,10 +60,10 @@ class DashboardController extends Controller
                 'is_master' => $user->admin->is_master ?? false,
             ],
             'stats' => [
-                'total_admins' => \App\Models\Admin::count(),
-                'total_doctors' => \App\Models\Doctor::count(),
-                'total_receptionists' => \App\Models\Receptionist::count(),
-                'total_users' => \App\Models\User::count(),
+                'total_admins' => \App\Domain\Models\Admin::count(),
+                'total_doctors' => \App\Domain\Models\Doctor::count(),
+                'total_receptionists' => \App\Domain\Models\Receptionist::count(),
+                'total_users' => \App\Domain\Models\User::count(),
             ],
             'recent_activities' => [],
             'completed_consultations' => [
@@ -127,12 +127,12 @@ class DashboardController extends Controller
                 'registration_number' => $receptionist->registration_number ?? null,
             ],
             'daily_summary' => [
-                'appointments_today' => \App\Models\Appointment::whereDate('appointment_date', today())->count(),
-                'completed_today' => \App\Models\Appointment::whereDate('appointment_date', today())->where('status', 'completed')->count(),
-                'pending_today' => \App\Models\Appointment::whereDate('appointment_date', today())->where('status', 'scheduled')->count(),
-                'cancelled_today' => \App\Models\Appointment::whereDate('appointment_date', today())->where('status', 'canceled')->count(),
+                'appointments_today' => \App\Domain\Models\Appointment::whereDate('appointment_date', today())->count(),
+                'completed_today' => \App\Domain\Models\Appointment::whereDate('appointment_date', today())->where('status', 'completed')->count(),
+                'pending_today' => \App\Domain\Models\Appointment::whereDate('appointment_date', today())->where('status', 'scheduled')->count(),
+                'cancelled_today' => \App\Domain\Models\Appointment::whereDate('appointment_date', today())->where('status', 'canceled')->count(),
             ],
-            'weekly_appointments' => \App\Models\Appointment::whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
+            'weekly_appointments' => \App\Domain\Models\Appointment::whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
                 ->with(['patient', 'doctor.user'])
                 ->orderBy('appointment_date')
                 ->get(),
@@ -143,7 +143,7 @@ class DashboardController extends Controller
 
     private function getLastFiveCompletedConsultations()
     {
-        $consultations = \App\Models\Consultation::with(['appointment' => function($query) {
+        $consultations = \App\Domain\Models\Consultation::with(['appointment' => function($query) {
             $query->with(['doctor.user', 'patient'])
                   ->where('status', 'completed');
         }])
@@ -178,19 +178,19 @@ class DashboardController extends Controller
         $previousMonth = now()->subMonth()->startOfMonth();
         $previousMonthEnd = now()->subMonth()->endOfMonth();
 
-        $currentMonthRevenue = \App\Models\Appointment::where('status', 'completed')
+        $currentMonthRevenue = \App\Domain\Models\Appointment::where('status', 'completed')
             ->whereBetween('appointment_date', [$currentMonth, now()])
             ->sum('value');
 
-        $previousMonthRevenue = \App\Models\Appointment::where('status', 'completed')
+        $previousMonthRevenue = \App\Domain\Models\Appointment::where('status', 'completed')
             ->whereBetween('appointment_date', [$previousMonth, $previousMonthEnd])
             ->sum('value');
 
-        $currentMonthConsultations = \App\Models\Appointment::where('status', 'completed')
+        $currentMonthConsultations = \App\Domain\Models\Appointment::where('status', 'completed')
             ->whereBetween('appointment_date', [$currentMonth, now()])
             ->count();
 
-        $previousMonthConsultations = \App\Models\Appointment::where('status', 'completed')
+        $previousMonthConsultations = \App\Domain\Models\Appointment::where('status', 'completed')
             ->whereBetween('appointment_date', [$previousMonth, $previousMonthEnd])
             ->count();
 
@@ -239,7 +239,7 @@ class DashboardController extends Controller
     {
         $search = $request->get('search', '');
         
-        $consultations = \App\Models\Consultation::with(['appointment' => function($query) {
+        $consultations = \App\Domain\Models\Consultation::with(['appointment' => function($query) {
             $query->with(['doctor.user', 'patient', 'receptionist.user']);
         }])
         ->when($search, function ($query) use ($search) {
