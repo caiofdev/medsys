@@ -19,7 +19,7 @@ Route::middleware('user.type:admin')
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
-            
+        
             Route::get('dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 
             Route::controller(AdminController::class)->prefix('admins')->name('admins.')->group(function () {
@@ -52,30 +52,39 @@ Route::middleware('user.type:admin')
             });
         });
         
-    Route::get('receptionists/{receptionist}', [ReceptionistController::class, 'show'])->name('receptionist.show')->middleware('user.type:admin');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('doctor/dashboard', [DashboardController::class, 'doctorDashboard'])->name('doctor.dashboard')->middleware('user.type:doctor');
-    Route::get('receptionist/dashboard', [DashboardController::class, 'receptionistDashboard'])->name('receptionist.dashboard')->middleware('user.type:receptionist');
+Route::middleware('user.type:receptionist')
+    ->prefix('receptionist')
+    ->name('receptionist.')
+    ->group(function () {
+        Route::controller(PatientController::class)->prefix('patients')->name('patient.')->group(function () {
+        Route::get('{patient}', 'show')->name('show');
+        Route::post('/', 'store')->name('store');
+        Route::put('{patient}', 'update')->name('update');
+        Route::delete('{patient}', 'destroy')->name('destroy');
+        Route::get('/', 'index')->name('table');
+        });
 
-    Route::get('receptionist/patients', [PatientController::class, 'index'])->name('patient.table')->middleware('user.type:receptionist');
-    
-    
+        Route::controller(AppointmentController::class)->prefix('appointments')->name('appointment.')->group(function () {
+        Route::post('/', 'store')->name('store');
+        Route::get('patients', 'getPatients')->name('patients');
+        Route::get('doctors', 'getDoctors')->name('doctors');
+        });
+        
+        Route::get('consultations-list', [DashboardController::class, 'consultationsList'])->name('consultations-list');
+        Route::get('dashboard', [DashboardController::class, 'receptionistDashboard'])->name('dashboard');
+    });
 
-    Route::get('receptionist/patients/{patient}', [PatientController::class, 'show'])->name('patient.show')->middleware('user.type:receptionist');
-    Route::post('receptionist/patients', [PatientController::class, 'store'])->name('patient.store')->middleware('user.type:receptionist');
-    Route::put('receptionist/patients/{patient}', [PatientController::class, 'update'])->name('patient.update')->middleware('user.type:receptionist');
-    Route::delete('receptionist/patients/{patient}', [PatientController::class, 'destroy'])->name('patient.destroy')->middleware('user.type:receptionist');
 
     Route::get('doctor/start-consultation', [DoctorController::class, 'startConsultation'])->name('doctor.start-consultation')->middleware('user.type:doctor');
     Route::post('doctor/finish-consultation', [DoctorController::class, 'finishConsultation'])->name('doctor.finish-consultation')->middleware('user.type:doctor');
     Route::get('doctor/medical-record', [DoctorController::class, 'medicalRecords'])->name('doctor.medical-record')->middleware('user.type:doctor');
     Route::get('doctor/medical-record/{patient}', [DoctorController::class, 'showMedicalRecord'])->name('doctor.medical-record.show')->middleware('user.type:doctor');
 
-    Route::post('receptionist/appointments', [AppointmentController::class, 'store'])->name('appointment.store')->middleware('user.type:receptionist');
-    Route::get('receptionist/appointments/patients', [AppointmentController::class, 'getPatients'])->name('appointment.patients')->middleware('user.type:receptionist');
-    Route::get('receptionist/appointments/doctors', [AppointmentController::class, 'getDoctors'])->name('appointment.doctors')->middleware('user.type:receptionist');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('doctor/dashboard', [DashboardController::class, 'doctorDashboard'])->name('doctor.dashboard')->middleware('user.type:doctor');
+    
+    
 
-    Route::get('receptionist/consultations-list', [DashboardController::class, 'consultationsList'])->name('receptionist.consultations-list')->middleware('user.type:receptionist');
 
     Route::get('/csrf-token', function () {
         return response()->json(['token' => csrf_token()]);
