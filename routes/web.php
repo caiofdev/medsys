@@ -13,10 +13,6 @@ Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
 
-Route::get('/csrf-token', function () {
-    return response()->json(['token' => csrf_token()]);
-})->middleware('web');
-
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
