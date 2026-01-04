@@ -73,7 +73,6 @@ class DoctorController extends Controller
 
     public function show(Doctor $doctor)
     {
-        // Otimização: carregar user junto com doctor via route binding
         $doctor->loadMissing('user');
         
         return response()->json([
@@ -186,7 +185,6 @@ class DoctorController extends Controller
                 return back()->withErrors(['message' => 'Acesso negado.']);
             }
 
-            // Verificar se o appointment pertence ao médico logado
             $appointment = \App\Domain\Models\Appointment::where('id', $validated['appointment_id'])
                 ->where('doctor_id', $doctor->id)
                 ->first();
@@ -195,7 +193,6 @@ class DoctorController extends Controller
                 return back()->withErrors(['message' => 'Agendamento não encontrado ou não pertence a este médico.']);
             }
 
-            // Criar a consulta
             $consultation = \App\Domain\Models\Consultation::create([
                 'appointment_id' => $appointment->id,
                 'symptoms' => $validated['symptoms'],
@@ -203,7 +200,6 @@ class DoctorController extends Controller
                 'notes' => $validated['notes'] ?? '',
             ]);
 
-            // Atualizar o status do appointment para 'completed'
             $appointment->update(['status' => 'completed']);
 
             return back()->with('success', 'Consulta finalizada com sucesso!');
@@ -224,7 +220,6 @@ class DoctorController extends Controller
             return redirect()->route('doctor.dashboard')->withErrors(['message' => 'Acesso negado.']);
         }
 
-        // Buscar pacientes que já tiveram consultas com este médico
         $patients = \App\Domain\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
             $query->where('doctor_id', $doctor->id)
                   ->where('status', 'completed');
@@ -238,7 +233,6 @@ class DoctorController extends Controller
         ->orderBy('name', 'asc')
         ->get();
 
-        // Buscar todas as consultas concluídas deste médico
         $consultationData = \App\Domain\Models\Consultation::whereHas('appointment', function ($query) use ($doctor) {
             $query->where('doctor_id', $doctor->id)
                   ->where('status', 'completed');
@@ -264,7 +258,6 @@ class DoctorController extends Controller
             return redirect()->route('doctor.dashboard')->withErrors(['message' => 'Acesso negado.']);
         }
 
-        // Verificar se o paciente teve consultas com este médico
         $patient = \App\Domain\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
             $query->where('doctor_id', $doctor->id)
                   ->where('status', 'completed');
@@ -276,7 +269,6 @@ class DoctorController extends Controller
             return redirect()->route('doctor.medical-record')->withErrors(['message' => 'Paciente não encontrado ou sem consultas realizadas.']);
         }
 
-        // Buscar todas as consultas deste paciente com este médico
         $consultations = \App\Domain\Models\Consultation::whereHas('appointment', function ($query) use ($doctor, $patientId) {
             $query->where('doctor_id', $doctor->id)
                   ->where('patient_id', $patientId)
@@ -289,14 +281,13 @@ class DoctorController extends Controller
             return [
                 'id' => $consultation->id,
                 'date' => $consultation->appointment->appointment_date,
-                'type' => 'Consulta Médica', // Pode ser expandido para diferentes tipos
+                'type' => 'Consulta Médica', 
                 'diagnosis' => $consultation->diagnosis,
                 'symptoms' => $consultation->symptoms,
                 'notes' => $consultation->notes,
             ];
         });
 
-        // Histórico médico simulado - pode ser expandido com dados reais
         $medicalHistory = [
             'allergies' => [
                 'Penicilina',

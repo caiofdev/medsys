@@ -73,7 +73,6 @@ class ReceptionistController extends Controller
 
     public function show(Receptionist $receptionist)
     {
-        // Otimização: carregar user junto com receptionist via route binding
         $receptionist->loadMissing('user');
         
         return response()->json([

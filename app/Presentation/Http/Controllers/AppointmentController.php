@@ -20,11 +20,6 @@ class AppointmentController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('AppointmentController::store - Dados recebidos', ['data' => $request->all()]);
-        \Log::info('AppointmentController::store - Headers', ['headers' => $request->headers->all()]);
-        \Log::info('AppointmentController::store - CSRF Token da sessão', ['csrf_token' => csrf_token()]);
-        \Log::info('AppointmentController::store - CSRF Token do request', ['request_csrf_token' => $request->header('X-CSRF-TOKEN')]);
-        
         $validator = Validator::make($request->all(), [
             'patient_id' => 'required|exists:patients,id',
             'doctor_id' => 'required|exists:doctors,id',
@@ -84,9 +79,6 @@ class AppointmentController extends Controller
                 'receptionist_id' => $receptionistId
             ]);
 
-            // Otimização: remover load desnecessário pois não usamos os dados
-            // $appointment->load(['patient', 'doctor', 'receptionist']);
-
             return back()->with('success', 'Consulta agendada com sucesso!');
 
         } catch (\Exception $e) {
@@ -94,26 +86,6 @@ class AppointmentController extends Controller
             
             return back()->withErrors(['message' => 'Erro interno do servidor. Tente novamente.']);
         }
-    }
-
-    public function show(Appointment $appointment)
-    {
-        
-    }
-
-    public function edit(Appointment $appointment)
-    {
-    
-    }
-
-    public function update(Request $request, Appointment $appointment)
-    {
-        
-    }
-
-    public function destroy(Appointment $appointment)
-    {
-        
     }
 
     public function getPatients(Request $request)

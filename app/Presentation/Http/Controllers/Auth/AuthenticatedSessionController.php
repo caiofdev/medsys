@@ -33,7 +33,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
         
-        // OTIMIZAÇÃO CRÍTICA: Carregar relações do usuário e cachear tipo na sessão
         $user = auth()->user();
         $user->load(['admin', 'doctor', 'receptionist']);
         session(['user_type' => $user->getUserType()]);

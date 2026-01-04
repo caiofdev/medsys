@@ -28,14 +28,11 @@ class DashboardController extends Controller
     public function adminDashboard()
     {
         $user = auth()->user();
-        // OTIMIZAÇÃO: Garantir que admin está carregado
         $user->loadMissing('admin');
         
-        // Buscar dados dos relatórios diretamente
         $lastConsultationsData = $this->getLastFiveCompletedConsultations();
         $monthlyRevenueData = $this->getMonthlyRevenue();
         
-        // Preparar dados das últimas consultas para o gráfico
         $consultationsChartData = [];
         $consultationsLabels = [];
         if (isset($lastConsultationsData['data'])) {
@@ -45,7 +42,6 @@ class DashboardController extends Controller
             }
         }
         
-        // Preparar dados de receita mensal
         $monthlyRevenueValues = [];
         if (isset($monthlyRevenueData['data'])) {
             $monthlyRevenueValues = [
@@ -54,7 +50,6 @@ class DashboardController extends Controller
             ];
         }
         
-            // Otimização: buscar stats com cache de 5 minutos
         $stats = cache()->remember('dashboard_stats', 300, function() {
             return [
                 'total_admins' => \App\Domain\Models\Admin::count(),
@@ -96,11 +91,9 @@ class DashboardController extends Controller
     public function doctorDashboard()
     {
         $user = auth()->user();
-        // OTIMIZAÇÃO: Garantir que doctor está carregado
         $user->loadMissing('doctor');
         $doctor = $user->doctor;
         
-        // Otimização: usar query única para contadores
         $appointmentsQuery = $doctor->appointments()
             ->selectRaw('COUNT(*) as total')
             ->selectRaw('COUNT(CASE WHEN DATE(appointment_date) = CURDATE() THEN 1 END) as today')
@@ -134,11 +127,9 @@ class DashboardController extends Controller
     public function receptionistDashboard()
     {
         $user = auth()->user();
-        // OTIMIZAÇÃO: Garantir que receptionist está carregado
         $user->loadMissing('receptionist');
         $receptionist = $user->receptionist;
         
-        // Otimização: usar query única para contadores diários
         $dailySummary = \App\Domain\Models\Appointment::whereDate('appointment_date', today())
             ->selectRaw('COUNT(*) as appointments_today')
             ->selectRaw('COUNT(CASE WHEN status = "completed" THEN 1 END) as completed_today')
@@ -170,7 +161,6 @@ class DashboardController extends Controller
 
     private function getLastFiveCompletedConsultations()
     {
-        // Otimização: eager load correto e simplificado
         $consultations = \App\Domain\Models\Consultation::whereHas('appointment', function($query) {
             $query->where('status', 'completed');
         })
@@ -207,7 +197,6 @@ class DashboardController extends Controller
         $previousMonth = now()->subMonth()->startOfMonth();
         $previousMonthEnd = now()->subMonth()->endOfMonth();
 
-        // Otimização CRÍTICA: usar query única ao invés de 4 queries separadas
         $monthlyData = \App\Domain\Models\Appointment::where('status', 'completed')
             ->selectRaw('SUM(CASE WHEN appointment_date BETWEEN ? AND ? THEN value ELSE 0 END) as current_revenue', [$currentMonth, now()])
             ->selectRaw('SUM(CASE WHEN appointment_date BETWEEN ? AND ? THEN value ELSE 0 END) as previous_revenue', [$previousMonth, $previousMonthEnd])
