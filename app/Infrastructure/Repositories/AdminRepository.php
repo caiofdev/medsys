@@ -7,6 +7,7 @@ use App\Domain\Exceptions\AdminNotFoundException;
 use App\Domain\Models\Admin;
 use App\Domain\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class AdminRepository implements AdminRepositoryInterface
 {
@@ -44,25 +45,28 @@ class AdminRepository implements AdminRepositoryInterface
         $admin->user()->associate($user);
         $admin->save();
 
-        return $admin->fresh($user);
+        return $admin->fresh('user');
     }
 
     public function update(Admin $admin, array $data): Admin
     {
-        $userData = collect($data)->except(['is_master', 'password'])->toArray();
+        return DB::transaction(function () use ($admin, $data) {
 
-        if (isset($data['password'])) {
-            $userData['password'] = $data['password'];
-        }
+            $userData = [];
+            $userFields = ['name', 'email', 'phone', 'photo'];
+            
+            foreach ($userFields as $field) {
+                if (array_key_exists($field, $data)) {
+                    $userData[$field] = $data[$field];
+                }
+            }
 
-        $admin->user->update($userData);
+            if (!empty($userData)) {
+                $admin->user->update($userData);
+            }
 
-        if (isset($data['is_master'])) {
-            $admin->is_master = $data['is_master'];
-            $admin->save();
-        }
-
-        return $admin->fresh('user');
+            return $admin->fresh('user');
+        });
     }
 
     public function delete(Admin $admin): void
