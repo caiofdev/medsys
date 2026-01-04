@@ -2,12 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\DoctorController;
-use App\Http\Controllers\ReceptionistController;
-use App\Http\Controllers\PatientController;
-use App\Http\Controllers\AppointmentController;
+use App\Presentation\Http\Controllers\DashboardController;
+use App\Presentation\Http\Controllers\AdminController;
+use App\Presentation\Http\Controllers\DoctorController;
+use App\Presentation\Http\Controllers\ReceptionistController;
+use App\Presentation\Http\Controllers\PatientController;
+use App\Presentation\Http\Controllers\AppointmentController;
 
 Route::get('/', function () {
     return redirect()->route('login');
