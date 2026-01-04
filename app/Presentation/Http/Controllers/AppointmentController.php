@@ -84,7 +84,8 @@ class AppointmentController extends Controller
                 'receptionist_id' => $receptionistId
             ]);
 
-            $appointment->load(['patient', 'doctor', 'receptionist']);
+            // Otimização: remover load desnecessário pois não usamos os dados
+            // $appointment->load(['patient', 'doctor', 'receptionist']);
 
             return back()->with('success', 'Consulta agendada com sucesso!');
 

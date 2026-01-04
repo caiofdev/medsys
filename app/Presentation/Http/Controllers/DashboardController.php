@@ -28,6 +28,8 @@ class DashboardController extends Controller
     public function adminDashboard()
     {
         $user = auth()->user();
+        // OTIMIZAÇÃO: Garantir que admin está carregado
+        $user->loadMissing('admin');
         
         // Buscar dados dos relatórios diretamente
         $lastConsultationsData = $this->getLastFiveCompletedConsultations();
@@ -52,6 +54,16 @@ class DashboardController extends Controller
             ];
         }
         
+            // Otimização: buscar stats com cache de 5 minutos
+        $stats = cache()->remember('dashboard_stats', 300, function() {
+            return [
+                'total_admins' => \App\Domain\Models\Admin::count(),
+                'total_doctors' => \App\Domain\Models\Doctor::count(),
+                'total_receptionists' => \App\Domain\Models\Receptionist::count(),
+                'total_users' => \App\Domain\Models\User::count(),
+            ];
+        });
+
         $dashboardData = [
             'user' => [
                 'name' => $user->name,
@@ -59,12 +71,7 @@ class DashboardController extends Controller
                 'role' => 'ADMINISTRADOR',
                 'is_master' => $user->admin->is_master ?? false,
             ],
-            'stats' => [
-                'total_admins' => \App\Domain\Models\Admin::count(),
-                'total_doctors' => \App\Domain\Models\Doctor::count(),
-                'total_receptionists' => \App\Domain\Models\Receptionist::count(),
-                'total_users' => \App\Domain\Models\User::count(),
-            ],
+            'stats' => $stats,
             'recent_activities' => [],
             'completed_consultations' => [
                 'labels' => $consultationsLabels,
@@ -89,7 +96,17 @@ class DashboardController extends Controller
     public function doctorDashboard()
     {
         $user = auth()->user();
+        // OTIMIZAÇÃO: Garantir que doctor está carregado
+        $user->loadMissing('doctor');
         $doctor = $user->doctor;
+        
+        // Otimização: usar query única para contadores
+        $appointmentsQuery = $doctor->appointments()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('COUNT(CASE WHEN DATE(appointment_date) = CURDATE() THEN 1 END) as today')
+            ->selectRaw('COUNT(CASE WHEN appointment_date BETWEEN ? AND ? THEN 1 END) as week', [now()->startOfWeek(), now()->endOfWeek()])
+            ->selectRaw('COUNT(CASE WHEN MONTH(appointment_date) = ? AND YEAR(appointment_date) = ? THEN 1 END) as month', [now()->month, now()->year])
+            ->first();
         
         $dashboardData = [
             'user' => [
@@ -100,9 +117,9 @@ class DashboardController extends Controller
                 'specialty' => $doctor->specialty->name ?? 'Não definido',
             ],
             'appointments' => [
-                'today' => $doctor->appointments()->whereDate('appointment_date', today())->count(),
-                'week' => $doctor->appointments()->whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-                'month' => $doctor->appointments()->whereMonth('appointment_date', now()->month)->count(),
+                'today' => $appointmentsQuery->today ?? 0,
+                'week' => $appointmentsQuery->week ?? 0,
+                'month' => $appointmentsQuery->month ?? 0,
             ],
             'upcoming_appointments' => $doctor->appointments()
                 ->whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
@@ -117,7 +134,17 @@ class DashboardController extends Controller
     public function receptionistDashboard()
     {
         $user = auth()->user();
+        // OTIMIZAÇÃO: Garantir que receptionist está carregado
+        $user->loadMissing('receptionist');
         $receptionist = $user->receptionist;
+        
+        // Otimização: usar query única para contadores diários
+        $dailySummary = \App\Domain\Models\Appointment::whereDate('appointment_date', today())
+            ->selectRaw('COUNT(*) as appointments_today')
+            ->selectRaw('COUNT(CASE WHEN status = "completed" THEN 1 END) as completed_today')
+            ->selectRaw('COUNT(CASE WHEN status = "scheduled" THEN 1 END) as pending_today')
+            ->selectRaw('COUNT(CASE WHEN status = "canceled" THEN 1 END) as cancelled_today')
+            ->first();
         
         $dashboardData = [
             'user' => [
@@ -127,10 +154,10 @@ class DashboardController extends Controller
                 'registration_number' => $receptionist->registration_number ?? null,
             ],
             'daily_summary' => [
-                'appointments_today' => \App\Domain\Models\Appointment::whereDate('appointment_date', today())->count(),
-                'completed_today' => \App\Domain\Models\Appointment::whereDate('appointment_date', today())->where('status', 'completed')->count(),
-                'pending_today' => \App\Domain\Models\Appointment::whereDate('appointment_date', today())->where('status', 'scheduled')->count(),
-                'cancelled_today' => \App\Domain\Models\Appointment::whereDate('appointment_date', today())->where('status', 'canceled')->count(),
+                'appointments_today' => $dailySummary->appointments_today ?? 0,
+                'completed_today' => $dailySummary->completed_today ?? 0,
+                'pending_today' => $dailySummary->pending_today ?? 0,
+                'cancelled_today' => $dailySummary->cancelled_today ?? 0,
             ],
             'weekly_appointments' => \App\Domain\Models\Appointment::whereBetween('appointment_date', [now()->startOfWeek(), now()->endOfWeek()])
                 ->with(['patient', 'doctor.user'])
@@ -143,15 +170,17 @@ class DashboardController extends Controller
 
     private function getLastFiveCompletedConsultations()
     {
-        $consultations = \App\Domain\Models\Consultation::with(['appointment' => function($query) {
-            $query->with(['doctor.user', 'patient'])
-                  ->where('status', 'completed');
-        }])
-        ->whereHas('appointment', function($query) {
+        // Otimização: eager load correto e simplificado
+        $consultations = \App\Domain\Models\Consultation::whereHas('appointment', function($query) {
             $query->where('status', 'completed');
         })
+        ->with([
+            'appointment.doctor.user:id,name',
+            'appointment.patient:id,name',
+            'appointment:id,value,appointment_date,doctor_id,patient_id,status'
+        ])
         ->latest('created_at')
-        ->take(5)
+        ->limit(5)
         ->get()
         ->map(function($consultation) {
             return [
@@ -178,21 +207,18 @@ class DashboardController extends Controller
         $previousMonth = now()->subMonth()->startOfMonth();
         $previousMonthEnd = now()->subMonth()->endOfMonth();
 
-        $currentMonthRevenue = \App\Domain\Models\Appointment::where('status', 'completed')
-            ->whereBetween('appointment_date', [$currentMonth, now()])
-            ->sum('value');
-
-        $previousMonthRevenue = \App\Domain\Models\Appointment::where('status', 'completed')
-            ->whereBetween('appointment_date', [$previousMonth, $previousMonthEnd])
-            ->sum('value');
-
-        $currentMonthConsultations = \App\Domain\Models\Appointment::where('status', 'completed')
-            ->whereBetween('appointment_date', [$currentMonth, now()])
-            ->count();
-
-        $previousMonthConsultations = \App\Domain\Models\Appointment::where('status', 'completed')
-            ->whereBetween('appointment_date', [$previousMonth, $previousMonthEnd])
-            ->count();
+        // Otimização CRÍTICA: usar query única ao invés de 4 queries separadas
+        $monthlyData = \App\Domain\Models\Appointment::where('status', 'completed')
+            ->selectRaw('SUM(CASE WHEN appointment_date BETWEEN ? AND ? THEN value ELSE 0 END) as current_revenue', [$currentMonth, now()])
+            ->selectRaw('SUM(CASE WHEN appointment_date BETWEEN ? AND ? THEN value ELSE 0 END) as previous_revenue', [$previousMonth, $previousMonthEnd])
+            ->selectRaw('COUNT(CASE WHEN appointment_date BETWEEN ? AND ? THEN 1 END) as current_count', [$currentMonth, now()])
+            ->selectRaw('COUNT(CASE WHEN appointment_date BETWEEN ? AND ? THEN 1 END) as previous_count', [$previousMonth, $previousMonthEnd])
+            ->first();
+        
+        $currentMonthRevenue = $monthlyData->current_revenue ?? 0;
+        $previousMonthRevenue = $monthlyData->previous_revenue ?? 0;
+        $currentMonthConsultations = $monthlyData->current_count ?? 0;
+        $previousMonthConsultations = $monthlyData->previous_count ?? 0;
 
         $revenueGrowth = $previousMonthRevenue > 0 
             ? (($currentMonthRevenue - $previousMonthRevenue) / $previousMonthRevenue) * 100 

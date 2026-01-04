@@ -50,6 +50,7 @@ class User extends Authenticatable
 
     public function getUserType(): ?string
     {
+        // OTIMIZAÇÃO CRÍTICA: Verifica relações carregadas primeiro
         if ($this->relationLoaded('admin') && $this->admin) {
             return 'admin';
         }
@@ -62,15 +63,18 @@ class User extends Authenticatable
             return 'receptionist';
         }
         
-        if ($this->admin()->exists()) {
+        // OTIMIZAÇÃO: Carregar todas as relações de uma vez ao invés de 3 queries separadas
+        $this->load(['admin', 'doctor', 'receptionist']);
+        
+        if ($this->admin) {
             return 'admin';
         }
         
-        if ($this->doctor()->exists()) {
+        if ($this->doctor) {
             return 'doctor';
         }
         
-        if ($this->receptionist()->exists()) {
+        if ($this->receptionist) {
             return 'receptionist';
         }
         

@@ -20,7 +20,13 @@ class CheckUserType
         }
 
         $user = auth()->user();
-        $userType = $user->getUserType();
+        
+        // OTIMIZAÇÃO CRÍTICA: Cachear tipo de usuário na sessão
+        $userType = session()->remember('user_type', function() use ($user) {
+            // Eager load todas as relações de uma vez
+            $user->load(['admin', 'doctor', 'receptionist']);
+            return $user->getUserType();
+        });
 
         // Verificar se o tipo do usuário está na lista de tipos permitidos
         if (!in_array($userType, $types)) {

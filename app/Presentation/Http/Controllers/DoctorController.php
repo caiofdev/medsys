@@ -73,7 +73,8 @@ class DoctorController extends Controller
 
     public function show(Doctor $doctor)
     {
-        $doctor->load('user');
+        // Otimização: carregar user junto com doctor via route binding
+        $doctor->loadMissing('user');
         
         return response()->json([
             'id' => $doctor->id,
