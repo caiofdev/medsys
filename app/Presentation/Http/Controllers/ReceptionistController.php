@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Presentation\Http\Controllers;
 
-use App\Domain\Models\Admin;
+use App\Domain\Models\Receptionist;
 use App\Domain\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class AdminController extends Controller
+class ReceptionistController extends Controller
 {
     public function index(Request $request)
     {
         $search = $request->get('search', '');
         
-        $admins = Admin::with('user')->when($search, function ($query) use ($search) {
-            $query->whereHas('user', function ($userQuery) use ($search) {
-                $userQuery->where('name', 'like', "%{$search}%");
-            });
-        })->paginate(8)->withQueryString();
+        $receptionists = Receptionist::with('user')->when($search, function ($query) use ($search) {
+                $query->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', "%{$search}%");
+                });
+            })->paginate(8)->withQueryString();
 
-        return Inertia::render('tables/admin-table', [
-            'admins' => $admins,
+        return Inertia::render('tables/receptionist-table', [
+            'receptionists' => $receptionists,
             'filters' => [
                 'search' => $search,
             ],
@@ -37,7 +37,7 @@ class AdminController extends Controller
             'phone' => 'required|string|max:20',
             'password' => 'required|string|min:6',
             'birth_date' => 'required|date',
-            'is_master' => 'required|in:yes,no',
+            'register_number' => 'required|string|max:20|unique:receptionists,registration_number',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -60,38 +60,38 @@ class AdminController extends Controller
 
             $user = User::create($userData);
 
-            $admin = Admin::create([
+            $receptionist = Receptionist::create([
                 'user_id' => $user->id,
-                'is_master' => $validated['is_master'] === 'yes',
+                'registration_number' => $validated['register_number'],
             ]);
 
-            return back()->with('success', 'Administrador criado com sucesso.');
+            return back()->with('success', 'Recepcionista criado com sucesso.');
         } catch (\Exception $e) {
-            return back()->withErrors(['message' => 'Erro ao criar administrador: ' . $e->getMessage()]);
+            return back()->withErrors(['message' => 'Erro ao criar recepcionista: ' . $e->getMessage()]);
         }
     }
 
-    public function show(Admin $admin)
+    public function show(Receptionist $receptionist)
     {
-        $admin->load('user');
+        $receptionist->load('user');
         
         return response()->json([
-            'id' => $admin->id,
-            'name' => $admin->user->name,
-            'email' => $admin->user->email,
-            'cpf' => $admin->user->cpf,
-            'phone' => $admin->user->phone,
-            'photo' => $admin->user->photo ? asset('storage/' . $admin->user->photo) : null,
-            'is_master' => $admin->is_master,
-            'birth_date' => $admin->user->birth_date,
+            'id' => $receptionist->id,
+            'name' => $receptionist->user->name,
+            'email' => $receptionist->user->email,
+            'cpf' => $receptionist->user->cpf,
+            'phone' => $receptionist->user->phone,
+            'photo' => $receptionist->user->photo ? asset('storage/' . $receptionist->user->photo) : null,
+            'birth_date' => $receptionist->user->birth_date,
+            'register_number' => $receptionist->registration_number,
         ]);
     }
 
-    public function update(Request $request, Admin $admin)
+    public function update(Request $request, Receptionist $receptionist)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $admin->user->id,
+            'email' => 'required|email|unique:users,email,' . $receptionist->user->id,
             'phone' => 'required|string|max:20',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -103,8 +103,8 @@ class AdminController extends Controller
         ];
 
         if ($request->hasFile('photo')) {
-            if ($admin->user->photo && file_exists(public_path('storage/' . $admin->user->photo))) {
-                unlink(public_path('storage/' . $admin->user->photo));
+            if ($receptionist->user->photo && file_exists(public_path('storage/' . $receptionist->user->photo))) {
+                unlink(public_path('storage/' . $receptionist->user->photo));
             }
 
             $file = $request->file('photo');
@@ -113,26 +113,23 @@ class AdminController extends Controller
             $updateData['photo'] = 'photos/' . $filename;
         }
 
-        $admin->user->update($updateData);
+        $receptionist->user->update($updateData);
 
-        return back()->with('success', 'Administrador atualizado com sucesso.');
+        return back()->with('success', 'Recepcionista atualizado com sucesso.');
     }
 
-    public function destroy(Admin $admin)
+    public function destroy(Receptionist $receptionist)
     {
-        if ($admin->is_master) {
-            $masterCount = Admin::where('is_master', true)->count();
-            if ($masterCount <= 1) {
-                return back()->withErrors(['message' => 'Não é possível deletar o último administrador master do sistema.']);
-            }
-        }
-
         try {
-            $admin->user->delete();
+            if ($receptionist->user->photo && file_exists(public_path('storage/' . $receptionist->user->photo))) {
+                unlink(public_path('storage/' . $receptionist->user->photo));
+            }
+
+            $receptionist->user->delete();
             
-            return back()->with('success', 'Administrador deletado com sucesso.');
+            return back()->with('success', 'Recepcionista deletado com sucesso.');
         } catch (\Exception $e) {
-            return back()->withErrors(['message' => 'Erro ao deletar administrador: ' . $e->getMessage()]);
+            return back()->withErrors(['message' => 'Erro ao deletar recepcionista: ' . $e->getMessage()]);
         }
     }
 }
