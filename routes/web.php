@@ -14,53 +14,60 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('admin/dashboard', [DashboardController::class, 'adminDashboard'])->name('admin.dashboard')->middleware('user.type:admin');
-    Route::get('doctor/dashboard', [DashboardController::class, 'doctorDashboard'])->name('doctor.dashboard')->middleware('user.type:doctor');
-    Route::get('receptionist/dashboard', [DashboardController::class, 'receptionistDashboard'])->name('receptionist.dashboard')->middleware('user.type:receptionist');
 
-    Route::get('admin/admins', [AdminController::class, 'index'])->name('admin.table')->middleware('user.type:admin');
-    Route::get('admin/doctors', [DoctorController::class, 'index'])->name('doctor.table')->middleware('user.type:admin');
-    Route::get('admin/receptionists', [ReceptionistController::class, 'index'])->name('receptionist.table')->middleware('user.type:admin');
-    Route::get('receptionist/patients', [PatientController::class, 'index'])->name('patient.table')->middleware('user.type:receptionist');
+    Route::middleware('user.type:admin')
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            
+        Route::get('dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
+
+        Route::apiResource('admins', AdminController::class);
+
+        Route::apiResource('doctors', DoctorController::class);
+
+        Route::apiResource('receptionists', ReceptionistController::class);
+
+        Route::controller(DashboardController::class)->prefix('reports')->name('reports.')->group(function () {
+            Route::get('last-consultations', 'getLastFiveCompletedConsultationsApi')->name('last-consultations');
+            Route::get('monthly-revenue', 'getMonthlyRevenueApi')->name('monthly-revenue');
+        });
+
+    });
+            
+    Route::middleware('user.type:receptionist')
+        ->prefix('receptionist')
+        ->name('receptionist.')
+        ->group(function () {
+
+        Route::get('dashboard', [DashboardController::class, 'receptionistDashboard'])->name('dashboard');
+        Route::get('consultations-list', [DashboardController::class, 'consultationsList'])->name('consultations-list');
+
+        Route::apiResource('patients', PatientController::class);
+
+        Route::controller(AppointmentController::class)->prefix('appointments')->name('appointment.')->group(function () {
+            Route::post('/', 'store')->name('store');
+            Route::get('patients', 'getPatients')->name('patients');
+            Route::get('doctors', 'getDoctors')->name('doctors');
+        });  
+              
+    });
+
+    Route::middleware('user.type:doctor')
+        ->prefix('doctor')
+        ->name('doctor.')
+        ->group(function () {
+
+        Route::get('dashboard', [DashboardController::class, 'doctorDashboard'])->name('dashboard');
+        Route::get('medical-record/{patient}', [DoctorController::class, 'showMedicalRecord'])->name('medical-record.show');
+        Route::get('medical-record', [DoctorController::class, 'medicalRecords'])->name('medical-record');
+
+        Route::get('start-consultation', [DoctorController::class, 'startConsultation'])->name('start-consultation');
+        Route::post('finish-consultation', [DoctorController::class, 'finishConsultation'])->name('finish-consultation');
+    });
     
-    Route::get('admin/admins/{admin}', [AdminController::class, 'show'])->name('admin.show')->middleware('user.type:admin');
-    Route::post('admin/admins', [AdminController::class, 'store'])->name('admin.store')->middleware('user.type:admin');
-    Route::put('admin/admins/{admin}', [AdminController::class, 'update'])->name('admin.update')->middleware('user.type:admin');
-    Route::delete('admin/admins/{admin}', [AdminController::class, 'destroy'])->name('admin.destroy')->middleware('user.type:admin');
-    
-    Route::get('admin/reports/last-consultations', [DashboardController::class, 'getLastFiveCompletedConsultationsApi'])->name('admin.reports.last-consultations')->middleware('user.type:admin');
-    Route::get('admin/reports/monthly-revenue', [DashboardController::class, 'getMonthlyRevenueApi'])->name('admin.reports.monthly-revenue')->middleware('user.type:admin');
-
-    Route::get('admin/doctors/{doctor}', [DoctorController::class, 'show'])->name('doctor.show')->middleware('user.type:admin');
-    Route::post('admin/doctors', [DoctorController::class, 'store'])->name('doctor.store')->middleware('user.type:admin');
-    Route::put('admin/doctors/{doctor}', [DoctorController::class, 'update'])->name('doctor.update')->middleware('user.type:admin');
-    Route::delete('admin/doctors/{doctor}', [DoctorController::class, 'destroy'])->name('doctor.destroy')->middleware('user.type:admin');
-
-    Route::get('admin/receptionists/{receptionist}', [ReceptionistController::class, 'show'])->name('receptionist.show')->middleware('user.type:admin');
-    Route::post('admin/receptionists', [ReceptionistController::class, 'store'])->name('receptionist.store')->middleware('user.type:admin');
-    Route::put('admin/receptionists/{receptionist}', [ReceptionistController::class, 'update'])->name('receptionist.update')->middleware('user.type:admin');
-    Route::delete('admin/receptionists/{receptionist}', [ReceptionistController::class, 'destroy'])->name('receptionist.destroy')->middleware('user.type:admin');
-
-    Route::get('receptionist/patients/{patient}', [PatientController::class, 'show'])->name('patient.show')->middleware('user.type:receptionist');
-    Route::post('receptionist/patients', [PatientController::class, 'store'])->name('patient.store')->middleware('user.type:receptionist');
-    Route::put('receptionist/patients/{patient}', [PatientController::class, 'update'])->name('patient.update')->middleware('user.type:receptionist');
-    Route::delete('receptionist/patients/{patient}', [PatientController::class, 'destroy'])->name('patient.destroy')->middleware('user.type:receptionist');
-
-    Route::get('doctor/start-consultation', [DoctorController::class, 'startConsultation'])->name('doctor.start-consultation')->middleware('user.type:doctor');
-    Route::post('doctor/finish-consultation', [DoctorController::class, 'finishConsultation'])->name('doctor.finish-consultation')->middleware('user.type:doctor');
-    Route::get('doctor/medical-record', [DoctorController::class, 'medicalRecords'])->name('doctor.medical-record')->middleware('user.type:doctor');
-    Route::get('doctor/medical-record/{patient}', [DoctorController::class, 'showMedicalRecord'])->name('doctor.medical-record.show')->middleware('user.type:doctor');
-
-    Route::post('receptionist/appointments', [AppointmentController::class, 'store'])->name('appointment.store')->middleware('user.type:receptionist');
-    Route::get('receptionist/appointments/patients', [AppointmentController::class, 'getPatients'])->name('appointment.patients')->middleware('user.type:receptionist');
-    Route::get('receptionist/appointments/doctors', [AppointmentController::class, 'getDoctors'])->name('appointment.doctors')->middleware('user.type:receptionist');
-
-    Route::get('receptionist/consultations-list', [DashboardController::class, 'consultationsList'])->name('receptionist.consultations-list')->middleware('user.type:receptionist');
-
-    Route::get('/csrf-token', function () {
-        return response()->json(['token' => csrf_token()]);
-    })->middleware('web');
 });
 
 require __DIR__.'/settings.php';
