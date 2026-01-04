@@ -61,7 +61,6 @@ class AdminController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            // Otimização: Repository já retorna com user via eager loading
             $admin = $this->showAdmin->execute($id);
 
             return response()->json([
@@ -84,7 +83,6 @@ class AdminController extends Controller
     public function edit(int $id): Response
     {
         try {
-            // Otimização: Repository já retorna com user via eager loading
             $admin = $this->showAdmin->execute($id);
 
             return Inertia::render('admins/edit', [
