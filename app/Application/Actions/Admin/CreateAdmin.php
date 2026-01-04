@@ -23,7 +23,7 @@ class CreateAdmin
      */
     public function execute(array $data): void
     {
-        DB:transaction(function () use ($data) {
+        DB::transaction(function () use ($data) {
             
             $photoPath = null;
 
