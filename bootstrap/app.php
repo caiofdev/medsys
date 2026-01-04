@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Middleware\HandleAppearance;
-use App\Http\Middleware\HandleInertiaRequests;
+use App\Presentation\Http\Middleware\HandleAppearance;
+use App\Presentation\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'user.type' => \App\Http\Middleware\CheckUserType::class,
+            'user.type' => \App\Presentation\Http\Middleware\CheckUserType::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
