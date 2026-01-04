@@ -23,7 +23,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CreateAdmin::class);
         $this->app->bind(UpdateAdmin::class);
         $this->app->bind(DeleteAdmin::class);
-        $this->app->bind(SearchAdmins::class);
+        $this->app->bind(SearchAdmin::class);
         $this->app->bind(ShowAdmin::class);
     }
 }

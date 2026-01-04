@@ -5,7 +5,7 @@ namespace App\Presentation\Http\Controllers;
 use App\Application\Actions\Admin\CreateAdmin;
 use App\Application\Actions\Admin\UpdateAdmin;
 use App\Application\Actions\Admin\DeleteAdmin;
-use App\Application\Actions\Admin\SearchAdmins;
+use App\Application\Actions\Admin\SearchAdmin;
 use App\Application\Actions\Admin\ShowAdmin;
 use App\Domain\Exceptions\AdminNotFoundException;
 use App\Domain\Exceptions\CannotDeleteLastMasterException;
@@ -25,7 +25,7 @@ class AdminController extends Controller
         private CreateAdmin $createAdmin,
         private UpdateAdmin $updateAdmin,
         private DeleteAdmin $deleteAdmin,
-        private SearchAdmins $searchAdmins,
+        private SearchAdmin $searchAdmin,
         private ShowAdmin $showAdmin
     ) {}
 
@@ -33,7 +33,7 @@ class AdminController extends Controller
     {
         $search = $request->input('search');
         
-        $admins = $this->searchAdmins->execute($search, 10);
+        $admins = $this->searchAdmin->execute($search, 10);
 
         return Inertia::render('tables/admin-table', [
             'admins' => $admins,
