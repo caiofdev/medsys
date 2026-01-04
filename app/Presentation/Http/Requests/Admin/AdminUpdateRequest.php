@@ -5,6 +5,7 @@ namespace App\Presentation\Http\Requests\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use App\Domain\Models\Admin;
 
 class AdminUpdateRequest extends FormRequest
 {
@@ -23,6 +24,11 @@ class AdminUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $adminId = $this->route('admin');
+        
+        $admin = Admin::find($adminId);
+        $userId = $admin ? $admin->user_id : null;
+        
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -30,7 +36,7 @@ class AdminUpdateRequest extends FormRequest
                 'string',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->admin->user_id ?? null)
+                Rule::unique('users', 'email')->ignore($userId)
             ],
             'phone' => ['required', 'string', 'max:20'],
             'photo' => ['nullable', 'image', 'max:2048'],
