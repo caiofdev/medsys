@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Appointment;
+use App\Domain\Models\Appointment;
 use Illuminate\Database\Seeder;
 
 class AppointmentSeeder extends Seeder

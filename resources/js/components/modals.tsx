@@ -780,8 +780,12 @@ function ModalEdit({ user, type }: ModalProps) {
         <DialogContent className="bg-[#030D29] p-0 pt-3 rounded-2xl">
         <DialogHeader>
             <DialogTitle className="text-white text-center p-2">Editar {user ? user.name : type === "admin" ? "Administrador" : type === "receptionist" ? "Recepcionista" : type === "doctor" ? "Doutor" : "Paciente"}</DialogTitle>
+        </DialogHeader>
             
-            <DialogDescription className="flex-col max-h-[86vh] bg-white p-4 rounded-b-2xl space-y-4 text-[#030D29] overflow-y-auto flex-1 custom-scrollbar">
+            <div className="flex-col max-h-[86vh] bg-white p-4 rounded-b-2xl space-y-4 text-[#030D29] overflow-y-auto flex-1 custom-scrollbar">
+            {errorMessage && (
+                <InputError message={errorMessage} className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4" />
+            )}
             {type !== "patient" && (
                 <div className="flex flex-col items-center gap-2">
                     <Avatar className="h-24 w-24 border-2 border-[#9FA3AE]">
@@ -838,7 +842,6 @@ function ModalEdit({ user, type }: ModalProps) {
                         onChange={handleChange}
                         isTextArea
                     />
-                    <InputError message={errorMessage} className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4" />
             </div>
             )}
 
@@ -856,8 +859,7 @@ function ModalEdit({ user, type }: ModalProps) {
                 </button>
                 <DialogClose className="bg-[#030D29] text-white text-base px-5 py-1 rounded hover:scale-105 hover:bg-[#7A2E2E] transition cursor-pointer">Fechar</DialogClose>
             </div>
-            </DialogDescription>
-        </DialogHeader>
+            </div>
         </DialogContent>
     );
 }

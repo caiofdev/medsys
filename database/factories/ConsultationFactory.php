@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Appointment;
+use App\Domain\Models\Appointment;
 
 class ConsultationFactory extends Factory
 {
