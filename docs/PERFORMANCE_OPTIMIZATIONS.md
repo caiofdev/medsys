@@ -203,5 +203,5 @@ git merge feature/performance-optimizations
 
 ---
 
-**Author:** Jorge  
+**Author:** Caio  
 **Date:** January 5, 2026
