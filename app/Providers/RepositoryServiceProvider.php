@@ -2,20 +2,39 @@
 
 namespace App\Providers;
 
+use App\Application\Actions\Admin\CreateAdmin;
+use App\Application\Actions\Admin\UpdateAdmin;
+use App\Application\Actions\Admin\DeleteAdmin;
+use App\Application\Actions\Admin\SearchAdmin;
+use App\Application\Actions\Admin\ShowAdmin;
+use App\Application\Actions\Doctor\CreateDoctor;
+use App\Application\Actions\Doctor\UpdateDoctor;
+use App\Application\Actions\Doctor\DeleteDoctor;
+use App\Application\Actions\Doctor\SearchDoctor;
+use App\Application\Actions\Doctor\ShowDoctor;
+use App\Application\Actions\Doctor\StartConsultation;
+use App\Application\Actions\Doctor\FinishConsultation;
+use App\Application\Actions\Doctor\GetMedicalRecords;
+use App\Application\Actions\Doctor\ShowMedicalRecord;
 use App\Domain\Contracts\AdminRepositoryInterface;
+use App\Domain\Contracts\DoctorRepositoryInterface;
 use App\Infrastructure\Repositories\AdminRepository;
+use App\Infrastructure\Repositories\DoctorRepository;
+use App\Infrastructure\Services\FileUploadService;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     */
     public function register(): void
     {
         $this->app->bind(
             AdminRepositoryInterface::class,
             AdminRepository::class
+        );
+        
+        $this->app->bind(
+            DoctorRepositoryInterface::class,
+            DoctorRepository::class
         );
 
         $this->app->singleton(FileUploadService::class);
@@ -25,5 +44,15 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DeleteAdmin::class);
         $this->app->bind(SearchAdmin::class);
         $this->app->bind(ShowAdmin::class);
+        
+        $this->app->bind(CreateDoctor::class);
+        $this->app->bind(UpdateDoctor::class);
+        $this->app->bind(DeleteDoctor::class);
+        $this->app->bind(SearchDoctor::class);
+        $this->app->bind(ShowDoctor::class);
+        $this->app->bind(StartConsultation::class);
+        $this->app->bind(FinishConsultation::class);
+        $this->app->bind(GetMedicalRecords::class);
+        $this->app->bind(ShowMedicalRecord::class);
     }
 }
