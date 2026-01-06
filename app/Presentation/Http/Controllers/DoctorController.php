@@ -2,319 +2,232 @@
 
 namespace App\Presentation\Http\Controllers;
 
-use App\Domain\Models\Doctor;
-use App\Domain\Models\User;
+use App\Application\Actions\Doctor\CreateDoctor;
+use App\Application\Actions\Doctor\UpdateDoctor;
+use App\Application\Actions\Doctor\DeleteDoctor;
+use App\Application\Actions\Doctor\SearchDoctor;
+use App\Application\Actions\Doctor\ShowDoctor;
+use App\Application\Actions\Doctor\StartConsultation;
+use App\Application\Actions\Doctor\FinishConsultation;
+use App\Application\Actions\Doctor\GetMedicalRecords;
+use App\Application\Actions\Doctor\ShowMedicalRecord;
+use App\Domain\Exceptions\DoctorNotFoundException;
+use App\Presentation\Http\Controllers\Controller;
+use App\Presentation\Http\Requests\Doctor\DoctorStoreRequest;
+use App\Presentation\Http\Requests\Doctor\DoctorUpdateRequest;
+use App\Presentation\Http\Requests\Doctor\FinishConsultationRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class DoctorController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(
+        private CreateDoctor $createDoctor,
+        private UpdateDoctor $updateDoctor,
+        private DeleteDoctor $deleteDoctor,
+        private SearchDoctor $searchDoctor,
+        private ShowDoctor $showDoctor,
+        private StartConsultation $startConsultation,
+        private FinishConsultation $finishConsultation,
+        private GetMedicalRecords $getMedicalRecords,
+        private ShowMedicalRecord $showMedicalRecord
+    ) {}
+
+    /**
+     * Display a listing of doctors
+     */
+    public function index(Request $request): Response
     {
-        $search = $request->get('search', '');
+        $search = $request->input('search');
         
-        $doctors = Doctor::with(['user'])->when($search, function ($query) use ($search) {
-            $query->whereHas('user', function ($userQuery) use ($search) {
-                $userQuery->where('name', 'like', "%{$search}%");
-            });
-        })->paginate(8)->withQueryString();
+        $doctors = $this->searchDoctor->execute($search, 8);
 
         return Inertia::render('tables/doctor-table', [
             'doctors' => $doctors,
-            'filters' => [
-                'search' => $search,
-            ],
+            'filters' => ['search' => $search],
             'userRole' => 'admin'
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created doctor
+     */
+    public function store(DoctorStoreRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'cpf' => 'required|string|max:14|unique:users,cpf',
-            'phone' => 'required|string|max:20',
-            'password' => 'required|string|min:6',
-            'birth_date' => 'required|date',
-            'crm' => 'required|string|max:20|unique:doctors,crm',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
         try {
-            $userData = [
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'cpf' => $validated['cpf'],
-                'phone' => $validated['phone'],
-                'password' => bcrypt($validated['password']),
-                'birth_date' => $validated['birth_date'],
-            ];
-
-            if ($request->hasFile('photo')) {
-                $file = $request->file('photo');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('storage/photos'), $filename);
-                $userData['photo'] = 'photos/' . $filename;
-            }
-
-            $user = User::create($userData);
-
-            $doctor = Doctor::create([
-                'user_id' => $user->id,
-                'crm' => $validated['crm'],
-            ]);
+            $this->createDoctor->execute($request->validated());
 
             return back()->with('success', 'Médico criado com sucesso.');
+                
         } catch (\Exception $e) {
             return back()->withErrors(['message' => 'Erro ao criar médico: ' . $e->getMessage()]);
         }
     }
 
-    public function show(Doctor $doctor)
-    {
-        $doctor->loadMissing('user');
-        
-        return response()->json([
-            'id' => $doctor->id,
-            'name' => $doctor->user->name,
-            'email' => $doctor->user->email,
-            'cpf' => $doctor->user->cpf,
-            'phone' => $doctor->user->phone,
-            'photo' => $doctor->user->photo ? asset('storage/' . $doctor->user->photo) : null,
-            'birth_date' => $doctor->user->birth_date,
-            'crm' => $doctor->crm,
-        ]);
-    }
-
-    public function update(Request $request, Doctor $doctor)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $doctor->user->id,
-            'phone' => 'required|string|max:20',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        $updateData = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-        ];
-
-        if ($request->hasFile('photo')) {
-            if ($doctor->user->photo && file_exists(public_path('storage/' . $doctor->user->photo))) {
-                unlink(public_path('storage/' . $doctor->user->photo));
-            }
-
-            $file = $request->file('photo');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('storage/photos'), $filename);
-            $updateData['photo'] = 'photos/' . $filename;
-        }
-
-        $doctor->user->update($updateData);
-
-        return back()->with('success', 'Médico atualizado com sucesso.');
-    }
-
-    public function destroy(Doctor $doctor)
+    /**
+     * Display the specified doctor (retorna JSON para modal)
+     */
+    public function show(int $id): JsonResponse
     {
         try {
-            if ($doctor->user->photo && file_exists(public_path('storage/' . $doctor->user->photo))) {
-                unlink(public_path('storage/' . $doctor->user->photo));
-            }
+            $doctor = $this->showDoctor->execute($id);
+            $doctor->load('user');
 
-            $doctor->user->delete();
+            return response()->json([
+                'id' => $doctor->id,
+                'name' => $doctor->user->name,
+                'email' => $doctor->user->email,
+                'cpf' => $doctor->user->cpf,
+                'rg' => $doctor->user->rg,
+                'phone' => $doctor->user->phone,
+                'photo' => $doctor->user->photo ? asset('storage/' . $doctor->user->photo) : null,
+                'crm' => $doctor->crm,
+                'birth_date' => $doctor->user->birth_date,
+            ]);
             
+        } catch (DoctorNotFoundException $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
+    }
+
+    /**
+     * Update the specified doctor
+     */
+    public function update(DoctorUpdateRequest $request, int $id): RedirectResponse
+    {
+        try {
+            $this->updateDoctor->execute($id, $request->validated());
+
+            return back()->with('success', 'Médico atualizado com sucesso.');
+                
+        } catch (DoctorNotFoundException $e) {
+            return back()->withErrors(['message' => 'Médico não encontrado.']);
+            
+        } catch (\Exception $e) {
+            return back()->withErrors(['message' => 'Erro ao atualizar médico: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Remove the specified doctor
+     */
+    public function destroy(int $id): RedirectResponse
+    {
+        try {
+            $this->deleteDoctor->execute($id);
+
             return back()->with('success', 'Médico deletado com sucesso.');
+                
+        } catch (DoctorNotFoundException $e) {
+            return back()->withErrors(['message' => 'Médico não encontrado.']);
+            
         } catch (\Exception $e) {
             return back()->withErrors(['message' => 'Erro ao deletar médico: ' . $e->getMessage()]);
         }
     }
 
-    public function startConsultation()
+    /**
+     * Show start consultation page
+     */
+    public function startConsultation(): Response
     {
-        $user = auth()->user();
-        $doctor = $user->doctor;
-        
-        if (!$doctor) {
-            return redirect()->route('doctor.dashboard')->withErrors(['message' => 'Acesso negado.']);
-        }
-
-        $appointments = \App\Domain\Models\Appointment::with(['patient'])
-            ->where('doctor_id', $doctor->id)
-            ->where('status', 'scheduled')
-            ->whereDate('appointment_date', '>=', now()->toDateString())
-            ->orderBy('appointment_date', 'asc')
-            ->get();
-
-        $patients = \App\Domain\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
-            $query->where('doctor_id', $doctor->id);
-        })
-        ->select('id', 'name', 'email', 'cpf', 'phone', 'birth_date', 'gender', 'emergency_contact', 'medical_history')
-        ->orderBy('name', 'asc')
-        ->get();
-
-        return Inertia::render('doctors/start-consultation', [
-            'appointments' => $appointments,
-            'patients' => $patients,
-            'userRole' => 'doctor'
-        ]);
-    }
-
-    public function finishConsultation(Request $request)
-    {
-        $validated = $request->validate([
-            'appointment_id' => 'required|exists:appointments,id',
-            'symptoms' => 'required|string',
-            'diagnosis' => 'required|string',
-            'notes' => 'nullable|string',
-        ], [
-            'appointment_id.required' => 'ID do agendamento é obrigatório.',
-            'appointment_id.exists' => 'Agendamento não encontrado.',
-            'symptoms.required' => 'Sintomas são obrigatórios.',
-            'diagnosis.required' => 'Diagnóstico é obrigatório.',
-        ]);
-
         try {
             $user = auth()->user();
             $doctor = $user->doctor;
-            
+
             if (!$doctor) {
-                return back()->withErrors(['message' => 'Acesso negado.']);
+                abort(403, 'Acesso negado. Usuário não é um médico.');
             }
 
-            $appointment = \App\Domain\Models\Appointment::where('id', $validated['appointment_id'])
-                ->where('doctor_id', $doctor->id)
-                ->first();
+            $data = $this->startConsultation->execute($doctor->id);
 
-            if (!$appointment) {
-                return back()->withErrors(['message' => 'Agendamento não encontrado ou não pertence a este médico.']);
-            }
-
-            $consultation = \App\Domain\Models\Consultation::create([
-                'appointment_id' => $appointment->id,
-                'symptoms' => $validated['symptoms'],
-                'diagnosis' => $validated['diagnosis'],
-                'notes' => $validated['notes'] ?? '',
+            return Inertia::render('doctors/start-consultation', [
+                'appointments' => $data['appointments'],
+                'patients' => $data['patients'],
+                'userRole' => 'doctor',
             ]);
 
-            $appointment->update(['status' => 'completed']);
+        } catch (\Exception $e) {
+            abort(500, 'Erro ao carregar página de consultas: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Finish a consultation
+     */
+    public function finishConsultation(FinishConsultationRequest $request): RedirectResponse
+    {
+        try {
+            $user = auth()->user();
+            $doctor = $user->doctor;
+
+            if (!$doctor) {
+                return back()->withErrors(['message' => 'Acesso negado. Usuário não é um médico.']);
+            }
+
+            $this->finishConsultation->execute($doctor->id, $request->validated());
 
             return back()->with('success', 'Consulta finalizada com sucesso!');
 
         } catch (\Exception $e) {
-            \Log::error('Erro ao finalizar consulta', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            
-            return back()->withErrors(['message' => 'Erro interno do servidor. Tente novamente.']);
+            return back()->withErrors(['message' => $e->getMessage()]);
         }
     }
 
-    public function medicalRecords()
+    /**
+     * Show medical records list
+     */
+    public function medicalRecords(): Response
     {
-        $user = auth()->user();
-        $doctor = $user->doctor;
-        
-        if (!$doctor) {
-            return redirect()->route('doctor.dashboard')->withErrors(['message' => 'Acesso negado.']);
+        try {
+            $user = auth()->user();
+            $doctor = $user->doctor;
+
+            if (!$doctor) {
+                abort(403, 'Acesso negado. Usuário não é um médico.');
+            }
+
+            $data = $this->getMedicalRecords->execute($doctor->id);
+
+            return Inertia::render('doctors/medical-record', [
+                'patients' => $data['patients'],
+                'doctor' => $data['doctor'],
+                'consultationData' => $data['consultationData'],
+                'userRole' => 'doctor',
+            ]);
+
+        } catch (\Exception $e) {
+            abort(500, 'Erro ao carregar prontuários: ' . $e->getMessage());
         }
-
-        $patients = \App\Domain\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
-            $query->where('doctor_id', $doctor->id)
-                  ->where('status', 'completed');
-        })
-        ->with(['appointments' => function ($query) use ($doctor) {
-            $query->where('doctor_id', $doctor->id)
-                  ->where('status', 'completed')
-                  ->with('consultation');
-        }])
-        ->select('id', 'name', 'email', 'cpf', 'phone', 'birth_date', 'gender', 'emergency_contact', 'medical_history')
-        ->orderBy('name', 'asc')
-        ->get();
-
-        $consultationData = \App\Domain\Models\Consultation::whereHas('appointment', function ($query) use ($doctor) {
-            $query->where('doctor_id', $doctor->id)
-                  ->where('status', 'completed');
-        })
-        ->with(['appointment.patient'])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-        return Inertia::render('doctors/medical-record', [
-            'patients' => $patients,
-            'doctor' => $doctor->load('user'),
-            'consultationData' => $consultationData,
-            'userRole' => 'doctor'
-        ]);
     }
 
-    public function showMedicalRecord($patientId)
+    /**
+     * Show individual medical record
+     */
+    public function showMedicalRecord(int $patientId): Response
     {
-        $user = auth()->user();
-        $doctor = $user->doctor;
-        
-        if (!$doctor) {
-            return redirect()->route('doctor.dashboard')->withErrors(['message' => 'Acesso negado.']);
+        try {
+            $user = auth()->user();
+            $doctor = $user->doctor;
+
+            if (!$doctor) {
+                abort(403, 'Acesso negado. Usuário não é um médico.');
+            }
+
+            $data = $this->showMedicalRecord->execute($doctor->id, $patientId);
+
+            return Inertia::render('doctors/individual-medical-record', [
+                'patient' => $data['patient'],
+                'consultations' => $data['consultations'],
+                'medicalHistory' => $data['medicalHistory'],
+                'userRole' => 'doctor'
+            ]);
+
+        } catch (\Exception $e) {
+            abort(500, 'Erro ao carregar prontuário: ' . $e->getMessage());
         }
-
-        $patient = \App\Domain\Models\Patient::whereHas('appointments', function ($query) use ($doctor) {
-            $query->where('doctor_id', $doctor->id)
-                  ->where('status', 'completed');
-        })
-        ->where('id', $patientId)
-        ->first();
-
-        if (!$patient) {
-            return redirect()->route('doctor.medical-record')->withErrors(['message' => 'Paciente não encontrado ou sem consultas realizadas.']);
-        }
-
-        $consultations = \App\Domain\Models\Consultation::whereHas('appointment', function ($query) use ($doctor, $patientId) {
-            $query->where('doctor_id', $doctor->id)
-                  ->where('patient_id', $patientId)
-                  ->where('status', 'completed');
-        })
-        ->with(['appointment'])
-        ->orderBy('created_at', 'desc')
-        ->get()
-        ->map(function ($consultation) {
-            return [
-                'id' => $consultation->id,
-                'date' => $consultation->appointment->appointment_date,
-                'type' => 'Consulta Médica', 
-                'diagnosis' => $consultation->diagnosis,
-                'symptoms' => $consultation->symptoms,
-                'notes' => $consultation->notes,
-            ];
-        });
-
-        $medicalHistory = [
-            'allergies' => [
-                'Penicilina',
-                'Ácido acetilsalicílico (AAS)',
-                'Amendoim'
-            ],
-            'medications' => [
-                'Losartana 50mg - 1x ao dia',
-                'Metformina 500mg - 2x ao dia',
-                'Omeprazol 20mg - 1x ao dia'
-            ],
-            'conditions' => [
-                'Hipertensão arterial',
-                'Diabetes tipo 2',
-                'Gastrite crônica'
-            ],
-            'surgeries' => [
-                'Apendicectomia (2018)',
-                'Colecistectomia laparoscópica (2020)'
-            ]
-        ];
-
-        return Inertia::render('doctors/individual-medical-record', [
-            'patient' => $patient,
-            'consultations' => $consultations,
-            'medicalHistory' => $medicalHistory,
-            'userRole' => 'doctor'
-        ]);
     }
 }
