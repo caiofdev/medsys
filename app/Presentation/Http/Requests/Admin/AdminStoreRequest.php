@@ -25,7 +25,7 @@ class AdminStoreRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', Password::defaults()],
+            'password' => ['required', Password::defaults(), 'confirmed'],
             'cpf' => ['required', 'string', 'size:11', 'unique:users,cpf'],
             'rg' => ['nullable', 'string', 'max:20'],
             'phone' => ['nullable', 'string', 'max:20'],
