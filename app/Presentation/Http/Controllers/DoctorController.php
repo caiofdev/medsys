@@ -36,9 +36,6 @@ class DoctorController extends Controller
         private ShowMedicalRecord $showMedicalRecord
     ) {}
 
-    /**
-     * Display a listing of doctors
-     */
     public function index(Request $request): Response
     {
         $search = $request->input('search');
@@ -52,9 +49,6 @@ class DoctorController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created doctor
-     */
     public function store(DoctorStoreRequest $request): RedirectResponse
     {
         try {
@@ -67,9 +61,6 @@ class DoctorController extends Controller
         }
     }
 
-    /**
-     * Display the specified doctor (retorna JSON para modal)
-     */
     public function show(int $id): JsonResponse
     {
         try {
@@ -93,9 +84,6 @@ class DoctorController extends Controller
         }
     }
 
-    /**
-     * Update the specified doctor
-     */
     public function update(DoctorUpdateRequest $request, int $id): RedirectResponse
     {
         try {
@@ -111,9 +99,6 @@ class DoctorController extends Controller
         }
     }
 
-    /**
-     * Remove the specified doctor
-     */
     public function destroy(int $id): RedirectResponse
     {
         try {
@@ -129,9 +114,6 @@ class DoctorController extends Controller
         }
     }
 
-    /**
-     * Show start consultation page
-     */
     public function startConsultation(): Response
     {
         try {
@@ -155,9 +137,6 @@ class DoctorController extends Controller
         }
     }
 
-    /**
-     * Finish a consultation
-     */
     public function finishConsultation(FinishConsultationRequest $request): RedirectResponse
     {
         try {
@@ -177,9 +156,6 @@ class DoctorController extends Controller
         }
     }
 
-    /**
-     * Show medical records list
-     */
     public function medicalRecords(): Response
     {
         try {
@@ -204,9 +180,6 @@ class DoctorController extends Controller
         }
     }
 
-    /**
-     * Show individual medical record
-     */
     public function showMedicalRecord(int $patientId): Response
     {
         try {
