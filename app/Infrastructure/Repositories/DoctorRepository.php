@@ -104,11 +104,10 @@ class DoctorRepository implements DoctorRepositoryInterface
 
     public function getPatientsWithConsultations(int $doctorId)
     {
-        return User::whereHas('patient.appointments', function ($query) use ($doctorId) {
+        return Patient::whereHas('appointments', function ($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId)
                   ->where('status', 'completed');
         })
-        ->with(['patient'])
         ->distinct()
         ->get();
     }
