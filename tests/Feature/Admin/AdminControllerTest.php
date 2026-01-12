@@ -291,4 +291,55 @@ class AdminControllerTest extends TestCase
 
         $response->assertSessionHasErrors(['password']);
     }
+
+    public function test_validates_unique_email_on_update_ignoring_own_id(): void
+    {
+        $adminUser = User::factory()->create();
+        Admin::factory()->create(['user_id' => $adminUser->id, 'is_master' => true]);
+
+        $otherUser = User::factory()->create(['email' => 'other@example.com']);
+        
+        $response = $this->actingAs($adminUser)
+            ->put(route('admin.admins.update', $adminUser->id), [ 
+                'name' => 'Updated Name',
+                'email' => 'other@example.com', 
+                'phone' => '11999999999',
+                'is_master' => 'yes'
+            ]);
+
+        $response->assertSessionHasErrors(['email']);
+
+        $response2 = $this->actingAs($adminUser)
+            ->put(route('admin.admins.update', $adminUser->id), [
+                'name' => 'Updated Name',
+                'email' => $adminUser->email, 
+                'phone' => '11999999999',
+                'is_master' => 'yes'
+            ]);
+            
+        $response2->assertSessionHasNoErrors();
+    }
+
+
+    public function test_non_master_admin_cannot_create_master_admin(): void
+    {
+        $commonUser = User::factory()->create();
+        Admin::factory()->create(['user_id' => $commonUser->id, 'is_master' => false]);
+
+        $data = [
+            'name' => 'Tentativa Master',
+            'email' => 'hacker@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'birth_date' => '1990-01-01',
+            'phone' => '11999999999',
+            'cpf' => '12345678900',
+            'is_master' => 'yes', 
+        ];
+
+        $response = $this->actingAs($commonUser)->post(route('admin.admins.store'), $data);
+
+
+        $response->assertForbidden(); 
+    }
 }
