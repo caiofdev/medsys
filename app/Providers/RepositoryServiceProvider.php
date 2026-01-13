@@ -22,12 +22,19 @@ use App\Application\Actions\Patient\DeletePatient;
 use App\Application\Actions\Patient\SearchPatient;
 use App\Application\Actions\Patient\ShowPatient;
 use App\Application\Actions\Patient\SearchPatientForAutocomplete;
+use App\Application\Actions\Receptionist\CreateReceptionist;
+use App\Application\Actions\Receptionist\UpdateReceptionist;
+use App\Application\Actions\Receptionist\DeleteReceptionist;
+use App\Application\Actions\Receptionist\SearchReceptionist;
+use App\Application\Actions\Receptionist\ShowReceptionist;
 use App\Domain\Contracts\AdminRepositoryInterface;
 use App\Domain\Contracts\DoctorRepositoryInterface;
 use App\Domain\Contracts\PatientRepositoryInterface;
+use App\Domain\Contracts\ReceptionistRepositoryInterface;
 use App\Infrastructure\Repositories\AdminRepository;
 use App\Infrastructure\Repositories\DoctorRepository;
 use App\Infrastructure\Repositories\PatientRepository;
+use App\Infrastructure\Repositories\ReceptionistRepository;
 use App\Infrastructure\Services\FileUploadService;
 use Illuminate\Support\ServiceProvider;
 
@@ -38,6 +45,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AdminRepositoryInterface::class, AdminRepository::class);
         $this->app->bind(DoctorRepositoryInterface::class, DoctorRepository::class);
         $this->app->bind(PatientRepositoryInterface::class, PatientRepository::class);
+        $this->app->bind(ReceptionistRepositoryInterface::class, ReceptionistRepository::class);
 
         $this->app->singleton(FileUploadService::class);
 
@@ -63,5 +71,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(SearchPatient::class);
         $this->app->bind(ShowPatient::class);
         $this->app->bind(SearchPatientForAutocomplete::class);
+        
+        $this->app->bind(CreateReceptionist::class);
+        $this->app->bind(UpdateReceptionist::class);
+        $this->app->bind(DeleteReceptionist::class);
+        $this->app->bind(SearchReceptionist::class);
+        $this->app->bind(ShowReceptionist::class);
     }
 }
