@@ -1,5 +1,4 @@
 <?php
-// filepath: app/Application/Actions/Patient/SearchPatientForAutocomplete.php
 
 namespace App\Application\Actions\Patient;
 
