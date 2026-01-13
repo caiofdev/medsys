@@ -16,10 +16,18 @@ use App\Application\Actions\Doctor\StartConsultation;
 use App\Application\Actions\Doctor\FinishConsultation;
 use App\Application\Actions\Doctor\GetMedicalRecords;
 use App\Application\Actions\Doctor\ShowMedicalRecord;
+use App\Application\Actions\Patient\CreatePatient;
+use App\Application\Actions\Patient\UpdatePatient;
+use App\Application\Actions\Patient\DeletePatient;
+use App\Application\Actions\Patient\SearchPatient;
+use App\Application\Actions\Patient\ShowPatient;
+use App\Application\Actions\Patient\SearchPatientForAutocomplete;
 use App\Domain\Contracts\AdminRepositoryInterface;
 use App\Domain\Contracts\DoctorRepositoryInterface;
+use App\Domain\Contracts\PatientRepositoryInterface;
 use App\Infrastructure\Repositories\AdminRepository;
 use App\Infrastructure\Repositories\DoctorRepository;
+use App\Infrastructure\Repositories\PatientRepository;
 use App\Infrastructure\Services\FileUploadService;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,15 +35,9 @@ class RepositoryServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(
-            AdminRepositoryInterface::class,
-            AdminRepository::class
-        );
-        
-        $this->app->bind(
-            DoctorRepositoryInterface::class,
-            DoctorRepository::class
-        );
+        $this->app->bind(AdminRepositoryInterface::class, AdminRepository::class);
+        $this->app->bind(DoctorRepositoryInterface::class, DoctorRepository::class);
+        $this->app->bind(PatientRepositoryInterface::class, PatientRepository::class);
 
         $this->app->singleton(FileUploadService::class);
 
@@ -54,5 +56,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(FinishConsultation::class);
         $this->app->bind(GetMedicalRecords::class);
         $this->app->bind(ShowMedicalRecord::class);
+        
+        $this->app->bind(CreatePatient::class);
+        $this->app->bind(UpdatePatient::class);
+        $this->app->bind(DeletePatient::class);
+        $this->app->bind(SearchPatient::class);
+        $this->app->bind(ShowPatient::class);
+        $this->app->bind(SearchPatientForAutocomplete::class);
     }
 }
