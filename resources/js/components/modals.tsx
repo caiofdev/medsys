@@ -1,14 +1,13 @@
-import { useState, useEffect, createContext, useContext, ReactNode, use, useRef } from "react"
+import { useState, useEffect, createContext, useContext, ReactNode, useRef } from "react"
 import { useInitials } from '@/hooks/use-initials';
 import { InputField } from "./input-field";
 import { SelectField } from "./select-field";
-import { faUser, faEnvelope, faIdCard, faPhone, faGear, faLocation, faIdCardClip, faCommentMedical, faCalendar, faKey} from "@fortawesome/free-solid-svg-icons";
+import { faUser, faEnvelope, faIdCard, faPhone, faGear, faIdCardClip, faCommentMedical, faCalendar, faKey} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import InputError from "./input-error";
 import { router } from '@inertiajs/react';
-import { usePage } from '@inertiajs/react';
 
 
 const validateUserData = (formData: any, type: string, isEdit: boolean = false, fileInput?: HTMLInputElement | null) => {
@@ -557,21 +556,21 @@ function ModalView({ user, type }: ModalProps)  {
     const getInitials = useInitials();
 
     return (
-        <DialogContent className="bg-[#030D29] p-0 pt-3 rounded-2xl overflow-y-auto">
+        <DialogContent className="bg-foreground p-0 pt-3 rounded-2xl overflow-y-auto">
         <DialogHeader>
             <DialogTitle className="text-white text-center p-2">Detalhes de {user ? user.name : type === "admin" ? "Administrador" : type === "receptionist" ? "Recepcionista" : type === "doctor" ? "Doutor" : "Paciente"}</DialogTitle>
-            <DialogDescription className=" flex-col max-h-[86vh] bg-white p-4 rounded-b-2xl space-y-4 text-[#030D29] overflow-y-auto flex-1 custom-scrollbar">
+            <DialogDescription className=" flex-col max-h-[86vh] bg-white-50 p-4 rounded-b-2xl space-y-4 text-darktext overflow-y-auto flex-1 custom-scrollbar">
             {user ? (
                 <>
                     {type !== "patient" && (
                         <div className="flex justify-center">
-                            <Avatar className="h-22 w-22 rounded-full border-2 border-[#9FA3AE]">
+                            <Avatar className="h-22 w-22 rounded-full border-2 border-border">
                                 <AvatarImage
                                     src={user.photo}
                                     alt={user.name}
                                     className="object-cover w-full h-full rounded-full"
                                 />
-                                <AvatarFallback className="bg-[#9fa3ae63] text-2xl">
+                                <AvatarFallback className="bg-gray-400 text-2xl">
                                     {getInitials(user.name)}
                                 </AvatarFallback>
                             </Avatar>
@@ -649,7 +648,7 @@ function ModalView({ user, type }: ModalProps)  {
 
             <div className="w-full flex justify-center bg-white p-3 rounded-b-2xl">
                 <DialogFooter>
-                    <DialogClose className="text-white text-base bg-[#030D29] px-5 py-1 rounded hover:scale-105 hover:bg-[#7A2E2E] transition cursor-pointer">
+                    <DialogClose className="text-white text-base bg-foreground px-5 py-1 rounded hover:scale-102 hover:bg-error transition cursor-pointer">
                         Fechar
                     </DialogClose>
                 </DialogFooter>
@@ -777,24 +776,24 @@ function ModalEdit({ user, type }: ModalProps) {
 
 
     return (
-        <DialogContent className="bg-[#030D29] p-0 pt-3 rounded-2xl">
+        <DialogContent className="bg-foreground p-0 pt-3 rounded-2xl">
         <DialogHeader>
             <DialogTitle className="text-white text-center p-2">Editar {user ? user.name : type === "admin" ? "Administrador" : type === "receptionist" ? "Recepcionista" : type === "doctor" ? "Doutor" : "Paciente"}</DialogTitle>
             
-            <DialogDescription className="flex-col max-h-[86vh] bg-white p-4 rounded-b-2xl space-y-4 text-[#030D29] overflow-y-auto flex-1 custom-scrollbar">
+            <DialogDescription className="flex-col max-h-[86vh] bg-white-50 p-4 rounded-b-2xl space-y-4 text-darktext overflow-y-auto flex-1 custom-scrollbar">
             {type !== "patient" && (
                 <div className="flex flex-col items-center gap-2">
-                    <Avatar className="h-24 w-24 border-2 border-[#9FA3AE]">
+                    <Avatar className="h-24 w-24 border-2 border-border">
                         <AvatarImage 
                             src={preview} 
                             alt={user.name} 
                             className="object-cover w-full h-full rounded-full"
                         />
-                        <AvatarFallback className="bg-[#9fa3ae63] text-2xl">
+                        <AvatarFallback className="bg-gray-400 text-2xl">
                             {getInitials(user.name)}
                         </AvatarFallback>
                     </Avatar>
-                    <label className="bg-[#9fa3ae63] p-1 rounded cursor-pointer text-sm">
+                    <label className="bg-gray-400 p-1 rounded cursor-pointer text-sm">
                         Editar Foto
                         <input 
                             ref={fileInputRef}
@@ -849,12 +848,12 @@ function ModalEdit({ user, type }: ModalProps) {
                     className={`text-white text-base px-5 py-1 rounded hover:scale-105 transition cursor-pointer ${
                         (type === "admin" || type === "doctor" || type === "receptionist" || type === "patient") && isSaving 
                             ? 'bg-gray-400 cursor-not-allowed' 
-                            : 'bg-[#030D29] hover:bg-[#1C4F4A]'
+                            : 'bg-foreground hover:bg-success'
                     }`}
                 >
                     {(type === "admin" || type === "doctor" || type === "receptionist" || type === "patient") && isSaving ? 'Salvando...' : 'Salvar'}
                 </button>
-                <DialogClose className="bg-[#030D29] text-white text-base px-5 py-1 rounded hover:scale-105 hover:bg-[#7A2E2E] transition cursor-pointer">Fechar</DialogClose>
+                <DialogClose className="bg-foreground text-white text-base px-5 py-1 rounded hover:scale-105 hover:bg-error transition cursor-pointer">Fechar</DialogClose>
             </div>
             </DialogDescription>
         </DialogHeader>
@@ -974,23 +973,23 @@ function ModalCreate ({user, type}: ModalProps){
     };
 
     return (
-        <DialogContent className="bg-[#030D29] p-0 pt-3 rounded-2xl ">
+        <DialogContent className="bg-foreground p-0 pt-3 rounded-2xl ">
             <DialogHeader className="flex-shrink-0">
                 <DialogTitle className="text-white text-center p-2">Criar {type === "admin" ? "Administrador" : type === "receptionist" ? "Recepcionista" : type === "doctor" ? "Doutor" : "Paciente"}</DialogTitle>
-                <DialogDescription className="max-h-[86vh] bg-white p-4 rounded-b-2xl space-y-4 text-[#030D29] overflow-y-auto flex-1 custom-scrollbar flex-col">
+                <DialogDescription className="max-h-[86vh] bg-white-50 p-4 rounded-b-2xl space-y-4 text-digital-blue-800 overflow-y-auto flex-1 custom-scrollbar flex-col">
                     {type !== "patient" && (
                         <div className="flex flex-col items-center gap-2">
-                            <Avatar className="h-24 w-24 border-2 border-[#9FA3AE]">
+                            <Avatar className="h-24 w-24 border-2 border-border">
                                 <AvatarImage
                                     src={preview}
                                     alt="Preview"
                                 className="object-cover w-full h-full rounded-full"
                             />
-                            <AvatarFallback className="bg-gray-200 text-gray-600 flex items-center justify-center">
+                            <AvatarFallback className="bg-gray-200 border-1 border-border text-gray-700 flex items-center justify-center">
                                 <FontAwesomeIcon icon={faUser} className="text-3xl" />
                             </AvatarFallback>
                         </Avatar>
-                        <label className="bg-[#9fa3ae63] p-1 rounded cursor-pointer text-sm">
+                        <label className="bg-gray-200 rounded cursor-pointer text-sm font-semibold p-1 hover:bg-gray-300">
                             Adicionar Foto
                             <input 
                                 ref={fileInputRef}
@@ -1064,12 +1063,12 @@ function ModalCreate ({user, type}: ModalProps){
                             className={`text-white text-base px-5 py-1 rounded hover:scale-105 transition cursor-pointer ${
                                 (type === "admin" || type === "doctor" || type === "receptionist" || type === "patient") && isCreating 
                                     ? 'bg-gray-400 cursor-not-allowed' 
-                                    : 'bg-[#030D29] hover:bg-[#1C4F4A]'
+                                    : 'bg-foreground hover:bg-success'
                             }`}
                         > 
                             {(type === "admin" || type === "doctor" || type === "receptionist" || type === "patient") && isCreating ? "Criando..." : "Criar"}
                         </button>
-                        <DialogClose className="bg-[#030D29] text-white px-5 py-1 rounded hover:scale-105 hover:bg-[#7A2E2E] transition cursor-pointer text-base">Fechar</DialogClose>
+                        <DialogClose className="bg-foreground text-white px-5 py-1 rounded hover:scale-105 hover:bg-error transition cursor-pointer text-base">Fechar</DialogClose>
                     </div>
                 </DialogDescription>
             </DialogHeader>
@@ -1130,27 +1129,27 @@ function ModalDelete({ user, type }: ModalProps) {
     };
 
     return (
-        <DialogContent className="bg-[#030D29] p-0 pt-3 rounded-2xl overflow-y-auto">
+        <DialogContent className="bg-foreground p-0 pt-3 rounded-2xl overflow-y-auto">
             <DialogHeader>
                 <DialogTitle className="text-white text-center p-2">Excluir {user ? user.name : type === "admin" ? "Administrador" : type === "receptionist" ? "Recepcionista" : type === "doctor" ? "Doutor" : "Paciente"}</DialogTitle>
-                <DialogDescription className=" flex flex-col items-center text-base bg-white text-[#030D29] rounded-b-2xl space-y-4 p-7">
+                <DialogDescription className=" flex flex-col items-center text-base bg-white-50 text-darktext rounded-b-2xl space-y-4 p-7">
                     <div className="text-center">
                         <p className="mb-2">Tem certeza que deseja excluir o usuário <strong>{user.name}</strong>?</p>
                         <p className="text-sm text-gray-600">Esta ação não pode ser desfeita.</p>
                 </div>
-                <div className="w-full flex justify-center bg-white p-3 rounded-b-2xl gap-3">
+                <div className="w-full flex justify-center bg-white-50 p-3 rounded-b-2xl gap-3">
                     <button
                         onClick={handleDelete}
                         disabled={isDeleting}
                         className={`text-white text-base px-5 py-1 rounded hover:scale-105 transition cursor-pointer ${
                             isDeleting 
                                 ? 'bg-gray-400 cursor-not-allowed' 
-                                : 'bg-red-600 hover:bg-red-700'
+                                : 'bg-error hover:bg-error/90'
                         }`}
                     >
                         {isDeleting ? 'Excluindo...' : 'Excluir'}
                     </button>
-                    <DialogClose className="text-white text-base bg-[#030D29] px-5 py-1 rounded hover:scale-105 transition cursor-pointer">
+                    <DialogClose className="text-white text-base bg-foreground px-5 py-1 rounded hover:scale-105 transition cursor-pointer">
                         Cancelar
                     </DialogClose>
                 </div>
@@ -1205,10 +1204,10 @@ function ModalAppointment({ receptionist, patients, doctors }: { receptionist: U
     if (!receptionist) return null;
 
     return (
-        <DialogContent className="bg-[#030D29] p-0 pt-3 rounded-2xl">
+        <DialogContent className="bg-foreground p-0 pt-3 rounded-2xl">
             <DialogHeader className="flex-shrink-0">
                 <DialogTitle className="text-white text-center p-2">Agendar Consulta</DialogTitle>
-                <DialogDescription className="max-h-[86vh] bg-white p-4 rounded-b-2xl space-y-4 text-[#030D29] overflow-y-auto flex-1 custom-scrollbar flex-col">
+                <DialogDescription className="max-h-[86vh] bg-white-50 p-4 rounded-b-2xl space-y-4 text-darktext overflow-y-auto flex-1 custom-scrollbar flex-col">
                     <div className="flex flex-col gap-3">
                         <div className="relative">
                             <InputField
@@ -1228,7 +1227,7 @@ function ModalAppointment({ receptionist, patients, doctors }: { receptionist: U
                                     {filteredPatients.map(p => (
                                         <li
                                             key={p.id}
-                                            className="px-3 py-2 cursor-pointer hover:bg-[#f0f0f0]"
+                                            className="px-3 py-2 cursor-pointer hover:bg-white-300"
                                             onClick={() => handlePatientSelect(p)}
                                         >
                                             {p.name}
@@ -1251,11 +1250,11 @@ function ModalAppointment({ receptionist, patients, doctors }: { receptionist: U
                                 placeholder="Busque pelo nome do doutor"
                             />
                             {filteredDoctors.length > 0 && (
-                                <ul className="absolute z-10 bg-white border rounded w-full mt-1 max-h-40 overflow-y-auto shadow">
+                                <ul className="absolute z-10 bg-white-50 border rounded w-full mt-1 max-h-40 overflow-y-auto shadow">
                                     {filteredDoctors.map(d => (
                                         <li
                                             key={d.id}
-                                            className="px-3 py-2 cursor-pointer hover:bg-[#f0f0f0]"
+                                            className="px-3 py-2 cursor-pointer hover:bg-white-300"
                                             onClick={() => handleDoctorSelect(d)}
                                         >
                                             {d.name}
@@ -1286,13 +1285,13 @@ function ModalAppointment({ receptionist, patients, doctors }: { receptionist: U
                     </div>
                     <div className="w-full flex justify-center pt-4 gap-3">
                         <button
-                            className="bg-[#030D29] text-white text-base px-5 py-1 rounded hover:scale-105 transition cursor-pointer hover:bg-[#1C4F4A]"
+                            className="bg-foreground text-white text-base px-5 py-1 rounded hover:scale-105 transition cursor-pointer hover:bg-success"
                             onClick={handleCreateAppointment}
                             disabled={!selectedPatient || !selectedDoctor}
                         >
                             Agendar
                         </button>
-                        <DialogClose className="bg-[#030D29] text-white px-5 py-1 rounded hover:scale-105 hover:bg-[#7A2E2E] transition cursor-pointer text-base">Fechar</DialogClose>
+                        <DialogClose className="bg-foreground text-white px-5 py-1 rounded hover:scale-105 hover:bg-error transition cursor-pointer text-base">Fechar</DialogClose>
                     </div>
                 </DialogDescription>
             </DialogHeader>
