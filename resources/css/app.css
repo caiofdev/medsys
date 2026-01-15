@@ -5,166 +5,78 @@
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
-@custom-variant dark (&:is(.dark *));
-
 @theme {
     --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
 
-    --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
+    --radius-radius: 0.3rem;
 
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
+    --color-background: var(--color-white-50);
+    --color-foreground: var(--color-digital-blue-800);
 
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
+    --color-darktext: var(--color-digital-blue-900);
+    --color-lighttext: var(--color-white-50);
 
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
 
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
+    --color-success: var(--color-green-success);
+    --color-warning: var(--color-yellow-warning);
+    --color-error: var(--color-red-error);
 
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
+    --color-border: var(--color-gray-border);
+    --color-sidebar-border: var(--color-white-600);
+    --color-input: var(--color-white-600);
 
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
+    --color-digital-blue-50: #e5f0ff;
+    --color-digital-blue-100: #cce0ff;
+    --color-digital-blue-200: #99c2ff;
+    --color-digital-blue-300: #66a3ff;
+    --color-digital-blue-400: #3385ff;
+    --color-digital-blue-500: #0066ff;
+    --color-digital-blue-600: #0052cc;
+    --color-digital-blue-700: #003d99;
+    --color-digital-blue-800: #002966;
+    --color-digital-blue-900: #001433;
+    --color-digital-blue-950: #000e24;
 
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
+    --color-white-50: #fefefe;
+    --color-white-300: #f9f9f9;
+    --color-white-600: #d9d9d9;
 
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
-
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
-
-    --color-sidebar: var(--sidebar);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/*
-    The default border color has changed to `currentColor` in Tailwind CSS v4,
-    so we've added these compatibility styles to make sure everything still
-    looks the same as it did with Tailwind CSS v3.
-
-    If we ever want to remove these styles, we need to add an explicit border
-    color utility to any element that depends on these defaults.
-*/
 @layer base {
+
     *,
     ::after,
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-gray-border);
     }
 }
 
 :root {
-    --background: #DFDEDE;
-    --foreground: #030D29;
-    --card: #fffffffd;
-    --card-foreground: #030D29;
-    --popover: #fdfdfd;
-    --popover-foreground: #030D29;
-    --primary: #030D29;
-    --primary-foreground: #fdfdfd;
-    --secondary: #fdfdfd;
-    --secondary-foreground: #030D29;
-    --muted: #e4e4e4;
-    --muted-foreground: #8992a5;
-    --accent: #fdfdfd;
-    --accent-foreground:#030D29;
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: #030d293a;
-    --input: #030d293a;
-    --ring: #030d293a;
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: #030D29;
-    --sidebar-foreground: #fdfdfd;
-    --sidebar-primary: transparent;
-    --sidebar-primary-foreground: #fdfdfd;
-    --sidebar-accent: #fdfdfd13;
-    --sidebar-accent-foreground: #fdfdfd;
-    --sidebar-border: transparent;
-    --sidebar-ring: #030d293a;
-}
+    --color-digital-blue-50: #e5f0ff;
+    --color-digital-blue-100: #cce0ff;
+    --color-digital-blue-200: #99c2ff;
+    --color-digital-blue-300: #66a3ff;
+    --color-digital-blue-400: #3385ff;
+    --color-digital-blue-500: #0066ff;
+    --color-digital-blue-600: #0052cc;
+    --color-digital-blue-700: #003d99;
+    --color-digital-blue-800: #002966;
+    --color-digital-blue-900: #001433;
+    --color-digital-blue-950: #000e24;
 
-.custom-scrollbar::-webkit-scrollbar {
-    width: 5px;
-}
+    --color-white-50: #fefefe;
+    --color-white-300: #f9f9f9;
+    --color-white-600: #d9d9d9;
 
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 10px;
-    margin: 10px 0px;
-}
+    --color-gray-border: #2929290e;
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #030d29e8;
-    border-radius: 20px;
+    --color-green-success: #4CAF50;
+    --color-yellow-warning: #FFA726;
+    --color-red-error: #E53935;
 }
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #1a2332;
-}
-
-/* .dark {
-    --background: #01050f;
-    --foreground: #DFDEDE;
-    --card: #030d293a;
-    --card-foreground: #DFDEDE;
-    --popover: #030D29;
-    --popover-foreground: #DFDEDE;
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: #030D29;
-    --secondary: #030D29;
-    --secondary-foreground: #DFDEDE;
-    --muted: #01050f;
-    --muted-foreground: #DFDEDE;
-    --accent: #030D29;
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: #ffffff1e;
-    --input: #ffffff1e;
-    --ring: #ffffff1e;
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
-} */
 
 @layer base {
     * {
@@ -176,3 +88,86 @@
         @apply bg-background text-foreground;
     }
 }
+
+
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: var(--color-digital-blue-50) !important;
+}
+
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+    color: var(--color-digital-blue-700) !important;
+    font-weight: bold;
+}
+
+.fc .fc-col-header-cell {
+    background-color: var(--color-digital-blue-300) !important;
+    font-weight: 600 !important;
+    border-top-left-radius: var(--radius-radius);
+    border-top-right-radius: var(--radius-radius);
+}
+
+/* FullCalendar - Customização dos botões */
+.fc .fc-button-primary {
+    background-color: var(--color-digital-blue-200) !important;
+    border-color: var(--color-digital-blue-200) !important;
+    color: var(--color-darktext) !important;
+}
+
+.fc .fc-button-primary:focus,
+.fc .fc-button-primary:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.fc .fc-button-primary:active,
+.fc .fc-button-primary.fc-button-active {
+    background-color: var(--color-digital-blue-300) !important;
+    border-color: var(--color-digital-blue-300) !important;
+    font-weight: bold;
+}
+
+.fc .fc-button-primary:disabled {
+    background-color: var(--color-gray-400) !important;
+    border-color: var(--color-gray-400) !important;
+    opacity: 0.6;
+}
+
+/* FullCalendar - Capitalizar primeira letra do título */
+.fc .fc-toolbar-title {
+    text-transform: capitalize;
+    color: var(--color-digital-blue-900);
+    font-weight:600;
+}
+
+/* FullCalendar - Padronizar fonte */
+.fc {
+    font-family: var(--font-sans);
+}
+
+/* FullCalendar - Desativar hover dos eventos */
+.fc .fc-event:hover {
+    background-color: var(--color-digital-blue-300) !important;
+}
+
+/* FullCalendar - Estilo dos eventos */
+.fc .fc-event {
+    background-color: var(--color-digital-blue-200) !important;
+    border: none !important;
+    border-left: 4px solid var(--color-digital-blue-500) !important;
+    border-radius: 4px !important;
+}
+
+/* FullCalendar - Bordas do grid e fundo */
+.fc .fc-scrollgrid {
+    border-color: #e0e0e0 !important;
+}
+
+.fc .fc-scrollgrid td,
+.fc .fc-scrollgrid th {
+    border-color: #e0e0e0 !important;
+}
+
+.fc .fc-daygrid-day {
+    background-color: var(--color-white-300) !important;
+}
+
