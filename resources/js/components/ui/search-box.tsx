@@ -19,7 +19,7 @@ export default function SearchBox({ placeHolder, value = '', onChange }: SearchB
                     placeholder={placeHolder}
                     value={value}
                     onChange={(e) => onChange?.(e.target.value)}
-                    className="w-full rounded-2xl border border-neutral-300 bg-[#030D29] x-4 px-4 py-2 text-sm text-white"
+                    className="w-full rounded-lg border border-neutral-300 bg-foreground px-4 py-2 text-sm text-white"
                 />
                 <button className="absolute right-2 top-1/2 -translate-y-1/2 mr-1 text-white cursor-pointer">
                     <FontAwesomeIcon icon={faMagnifyingGlass}/>

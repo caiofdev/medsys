@@ -14,7 +14,7 @@ export function SelectField({ label, name, value, options, onChange }: SelectFie
             name={name}
             value={value}
             onChange={onChange}
-            className="bg-[#9fa3ae63] p-2 rounded-md text-[#030D29] focus:outline-none cursor-pointer"
+            className="bg-input p-2 rounded-md text-darktext focus:outline-none cursor-pointer"
         >
             {options.map((opt) => (
             <option key={opt.value} value={opt.value}>

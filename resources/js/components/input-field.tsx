@@ -26,7 +26,7 @@ export function InputField({
     return (
         <div className="flex flex-col w-full">
             <label className="font-bold">{label}</label>
-            <div className="flex justify-center items-center bg-[#9fa3ae63] p-2 rounded-md gap-2 custom-scrollbar">
+            <div className="flex justify-center items-center bg-input p-2 rounded-md gap-2 custom-scrollbar">
                 {icon}
                 {isTextArea ? (
                 <textarea
@@ -34,7 +34,7 @@ export function InputField({
                     value={value}
                     onChange={onChange}
                     disabled={disabled}
-                    className="w-full focus:outline-none text-[#030D29]"
+                    className="w-full focus:outline-none text-darktext bg-input"
                     placeholder={placeholder}
                     rows={2}
 
@@ -46,7 +46,7 @@ export function InputField({
                     value={value}
                     onChange={onChange}
                     disabled={disabled}
-                    className="w-full focus:outline-none text-[#030D29]"
+                    className="w-full focus:outline-none text-darktext bg-input"
                     placeholder={placeholder}
                 />
                 )}
