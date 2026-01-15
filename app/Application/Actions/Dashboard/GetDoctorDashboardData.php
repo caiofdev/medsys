@@ -19,7 +19,7 @@ class GetDoctorDashboardData
      */
     public function execute(User $user): array
     {
-        $user->loadMissing('doctor.specialty');
+        $user->loadMissing('doctor');
         $doctor = $user->doctor;
 
         $appointmentCounts = $this->dashboardRepository->getDoctorAppointmentCounts($doctor->id);
@@ -32,7 +32,7 @@ class GetDoctorDashboardData
                 'avatar' => $user->photo ? asset('storage/' . $user->photo) : '/doctor-pic.png',
                 'role' => 'DOUTOR',
                 'crm' => $doctor->crm ?? null,
-                'specialty' => $doctor->specialty->name ?? 'Não definido',
+                'specialty' => 'Clínico Geral', // ✅ Valor padrão
             ],
             'appointments' => $appointmentCounts,
             'upcoming_appointments' => $upcomingAppointments,
