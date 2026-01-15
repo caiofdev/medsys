@@ -6,6 +6,7 @@ use App\Domain\Contracts\DoctorRepositoryInterface;
 use App\Domain\Exceptions\DoctorNotFoundException;
 use App\Domain\Models\Doctor;
 use App\Domain\Models\User;
+use App\Domain\Models\Patient;
 use App\Domain\Models\Consultation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
