@@ -19,7 +19,7 @@ class AdminController extends Controller
             });
         })->paginate(8)->withQueryString();
 
-        return Inertia::render('tables/admin-table', [
+        return Inertia::render('admins/admin-table', [
             'admins' => $admins,
             'filters' => [
                 'search' => $search,
