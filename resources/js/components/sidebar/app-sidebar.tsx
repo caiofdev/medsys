@@ -1,13 +1,10 @@
-// Exemplo alternativo - versão dinâmica que varia por tipo de usuário
-
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { NavMain } from '@/components/sidebar/nav-main';
+import { NavUser } from '@/components/sidebar/nav-user';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/sidebar/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users, UserCheck, Stethoscope, Shield, Calendar, FileText, Settings, ClipboardList, Activity, User, Bell, Play, ClipboardPlus } from 'lucide-react';
-import AppLogo from './app-logo';
+import { LayoutGrid, Users, UserCheck, Stethoscope, Shield, ClipboardList, Play, ClipboardPlus, Calendar } from 'lucide-react';
+import AppLogo from '@/components/app-logo';
 
 type UserRole = 'admin' | 'doctor' | 'receptionist' | 'patient';
 
@@ -16,6 +13,11 @@ const adminNavItems: NavItem[] = [
         title: 'Dashboard',
         href: '/admin/dashboard',
         icon: LayoutGrid,
+    },
+    {
+        title: 'Calendário',
+        href: '/calendar',
+        icon: Calendar,
     },
     {
         title: 'Admins',
@@ -41,6 +43,11 @@ const doctorNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
+        title: 'Calendário',
+        href: '/calendar',
+        icon: Calendar,
+    },
+    {
         title: 'Iniciar Atendimento',
         href: '/doctor/start-consultation',
         icon: Play,
@@ -57,6 +64,11 @@ const receptionistNavItems: NavItem[] = [
         title: 'Dashboard',
         href: '/receptionist/dashboard',
         icon: LayoutGrid,
+    },
+    {
+        title: 'Calendário',
+        href: '/calendar',
+        icon: Calendar,
     },
     {
         title: 'Pacientes',
@@ -85,19 +97,6 @@ function getNavItemsByRole(userRole: UserRole): NavItem[] {
             return adminNavItems; // fallback
     }
 }
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
 
 interface AppSidebarProps {
     userRole: UserRole;
