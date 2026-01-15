@@ -1,4 +1,4 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/sidebar/sidebar';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
