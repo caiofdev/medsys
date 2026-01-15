@@ -92,14 +92,14 @@ class AppointmentController extends Controller
     {
         $query = $request->get('q', '');
         
-        $patients = Patient::when($query, function ($queryBuilder) use ($query) {
-                return $queryBuilder->where('name', 'LIKE', "%{$query}%")
-                                    ->orWhere('cpf', 'LIKE', "%{$query}%")
-                                    ->orWhere('email', 'LIKE', "%{$query}%");
-            })
-            ->select('id', 'name', 'cpf', 'email', 'phone')
-            ->limit(10)
-            ->get();
+        if (!$query) {
+            return response()->json([
+                'success' => true,
+                'patients' => []
+            ]);
+        }
+
+        $patients = $this->searchPatientForAutocomplete->execute($query);
 
         return response()->json([
             'success' => true,
