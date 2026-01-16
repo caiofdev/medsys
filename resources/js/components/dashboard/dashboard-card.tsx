@@ -1,9 +1,9 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { router } from '@inertiajs/react';
+import { LucideIcon } from 'lucide-react';
+import { createElement } from 'react';
 
 type DashboardCardProps = {
-    icon: IconDefinition,
+    icon: LucideIcon,
     title: string,
     color: string,
     route?: string,
@@ -13,13 +13,13 @@ export default function DashboardCard( { icon, title, color, route }: DashboardC
     return (
         <div 
             onClick={() => route && router.visit(route)}
-            className=" flex flex-col overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border h-full justify-center items-center gap-3 cursor-pointer hover:shadow-2xl hover:scale-102 bg-digital-blue-50" 
+            className="flex flex-col w-full h-full rounded-radius p-6 bg-digital-blue-50 border border-border gap-3 items-center justify-center" 
         >
             <div className='flex flex-col justify-center items-center'>
-                <FontAwesomeIcon icon={icon} style={{ color: `#${color}` }} className="text-6xl" /> 
+                {createElement(icon, { size: 45, color: `${color}`, strokeWidth: 1.5 })}
             </div>
             <div className='flex flex-col justify-center items-center'>
-                <p>{title}</p>
+                <p className='font-medium text-md text-center'>{title}</p>
             </div>
         </div>
     );
