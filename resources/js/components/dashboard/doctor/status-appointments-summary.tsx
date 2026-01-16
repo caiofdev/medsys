@@ -14,6 +14,7 @@ interface StatusAppointmentsSummaryProps {
    completed: number;
    scheduled: number;
    canceled: number;
+   title: string;
 }
 
 const chartData = [
@@ -38,6 +39,7 @@ export default function StatusAppointmentsSummary({
    completed,
    scheduled,
    canceled,
+   title,
 }: StatusAppointmentsSummaryProps) {
    const data = chartData.map((item) => {
    if (item.name === 'Concluídas') return { ...item, value: completed };
@@ -48,7 +50,7 @@ export default function StatusAppointmentsSummary({
    return (
    <div className="bg-digital-blue-50 rounded-radius border border-border shadow-sm p-6 w-full h-full flex flex-col">
       <h2 className="font-bold text-digital-blue-900 text-lg mb-4">
-         Status das Consultas
+         {title}
       </h2>
 
       <div className="flex-1">
