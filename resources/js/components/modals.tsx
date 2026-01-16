@@ -564,13 +564,13 @@ function ModalView({ user, type }: ModalProps)  {
                 <>
                     {type !== "patient" && (
                         <div className="flex justify-center">
-                            <Avatar className="h-22 w-22 rounded-full border-2 border-border">
+                            <Avatar className="h-22 w-22 rounded-full">
                                 <AvatarImage
                                     src={user.photo}
                                     alt={user.name}
                                     className="object-cover w-full h-full rounded-full"
                                 />
-                                <AvatarFallback className="bg-gray-400 text-2xl">
+                                <AvatarFallback className="text-2xl">
                                     {getInitials(user.name)}
                                 </AvatarFallback>
                             </Avatar>
@@ -783,17 +783,17 @@ function ModalEdit({ user, type }: ModalProps) {
             <DialogDescription className="flex-col max-h-[86vh] bg-white-50 p-4 rounded-b-2xl space-y-4 text-darktext overflow-y-auto flex-1 custom-scrollbar">
             {type !== "patient" && (
                 <div className="flex flex-col items-center gap-2">
-                    <Avatar className="h-24 w-24 border-2 border-border">
+                    <Avatar className="h-24 w-24">
                         <AvatarImage 
                             src={preview} 
                             alt={user.name} 
                             className="object-cover w-full h-full rounded-full"
                         />
-                        <AvatarFallback className="bg-gray-400 text-2xl">
+                        <AvatarFallback className="text-2xl">
                             {getInitials(user.name)}
                         </AvatarFallback>
                     </Avatar>
-                    <label className="bg-gray-400 p-1 rounded cursor-pointer text-sm">
+                    <label className="bg-gray-200 p-1 rounded cursor-pointer text-sm">
                         Editar Foto
                         <input 
                             ref={fileInputRef}
@@ -979,13 +979,13 @@ function ModalCreate ({user, type}: ModalProps){
                 <DialogDescription className="max-h-[86vh] bg-white-50 p-4 rounded-b-2xl space-y-4 text-digital-blue-800 overflow-y-auto flex-1 custom-scrollbar flex-col">
                     {type !== "patient" && (
                         <div className="flex flex-col items-center gap-2">
-                            <Avatar className="h-24 w-24 border-2 border-border">
+                            <Avatar className="h-24 w-24">
                                 <AvatarImage
                                     src={preview}
                                     alt="Preview"
                                 className="object-cover w-full h-full rounded-full"
                             />
-                            <AvatarFallback className="bg-gray-200 border-1 border-border text-gray-700 flex items-center justify-center">
+                            <AvatarFallback className="text-gray-700 flex items-center justify-center">
                                 <FontAwesomeIcon icon={faUser} className="text-3xl" />
                             </AvatarFallback>
                         </Avatar>
