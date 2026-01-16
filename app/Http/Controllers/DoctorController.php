@@ -19,7 +19,7 @@ class DoctorController extends Controller
             });
         })->paginate(8)->withQueryString();
 
-        return Inertia::render('tables/doctor-table', [
+        return Inertia::render('doctors/doctor-table', [
             'doctors' => $doctors,
             'filters' => [
                 'search' => $search,
