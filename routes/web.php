@@ -57,6 +57,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('receptionist/appointments/doctors', [AppointmentController::class, 'getDoctors'])->name('appointment.doctors')->middleware('user.type:receptionist');
 
     Route::get('receptionist/consultations-list', [DashboardController::class, 'consultationsList'])->name('receptionist.consultations-list')->middleware('user.type:receptionist');
+    
+    Route::get('calendar', function () {
+        return Inertia::render('Calendar');
+    })->name('calendar');
+
+    Route::get('calendar/appointments', [AppointmentController::class, 'getCalendarAppointments'])->name('calendar.appointments');
+
 
     Route::get('/csrf-token', function () {
         return response()->json(['token' => csrf_token()]);

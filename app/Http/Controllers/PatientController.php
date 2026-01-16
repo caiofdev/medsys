@@ -16,7 +16,7 @@ class PatientController extends Controller
                 $query->where('name', 'like', "%{$search}%");
             })->paginate(8)->withQueryString();
 
-        return Inertia::render('tables/patient-table', [
+        return Inertia::render('receptionists/patient-table', [
             'patients' => $patients,
             'filters' => [
                 'search' => $search,

@@ -19,7 +19,7 @@ class ReceptionistController extends Controller
                 });
             })->paginate(8)->withQueryString();
 
-        return Inertia::render('tables/receptionist-table', [
+        return Inertia::render('receptionists/receptionist-table', [
             'receptionists' => $receptionists,
             'filters' => [
                 'search' => $search,
