@@ -261,7 +261,7 @@ class DashboardController extends Controller
             })->orWhere('diagnosis', 'like', "%{$search}%");
         })
         ->orderBy('created_at', 'desc')
-        ->paginate(10)
+        ->paginate(9)
         ->withQueryString();
 
         return Inertia::render('receptionists/consultations-list', [
