@@ -102,7 +102,7 @@ const validateUserData = (formData: any, type: string, isEdit: boolean = false, 
 };
 
 
-interface User {
+export interface User {
     id: number
     name: string
     email: string
