@@ -24,17 +24,19 @@ interface DoctorDashboardProps {
         crm: string;
         specialty: string;
     };
-    appointments: {
-        today: number;
-        week: number;
-        month: number;
-    };
-    upcoming_appointments: {
+    upcoming_appointments: Array<{
         id: number;
-        time: string;
-        title: string;
-        description: string;
-    }[];
+        appointment_date: string;
+        patient: {
+            name: string;
+        };
+        doctor: {
+            user: {
+                name: string;
+            };
+        };
+        status: string;
+    }>;
 }
 
 export default function DoctorDashboard({ user,  upcoming_appointments }: DoctorDashboardProps) {
@@ -57,17 +59,29 @@ export default function DoctorDashboard({ user,  upcoming_appointments }: Doctor
                                 />
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                            <DashboardSchedule events={upcoming_appointments} />
-                            <StatusAppointmentsSummary  completed={5} scheduled={10} canceled={2} />
+                            <DashboardSchedule events={upcoming_appointments
+                                .filter(appointment => appointment.status !== 'canceled' )
+                                .map(appointment => ({
+                                    id: appointment.id,
+                                    date: appointment.appointment_date,
+                                    time: new Date(appointment.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                                    title: `Consulta: ${appointment.patient.name}`,
+                                }))
+                            } />
+                            <StatusAppointmentsSummary title="Status das Consultas da Semana" completed={5} scheduled={10} canceled={2} />
                         </div>
                     </div>
-                    <DashboardPatientsList patients={[
-                        { name: 'Lucas Ferreira', birth_date: '1990-05-15', email: 'lucas.ferreira@example.com' },
-                        { name: 'Mariana Silva', birth_date: '1985-08-22', email: 'mariana.silva@example.com' },
-                        { name: 'Pedro Gomes', birth_date: '1978-11-30', email: 'pedro.gomes@example.com' },
-                        { name: 'Ana Costa', birth_date: '1992-03-10', email: 'ana.costa@example.com' },
-                        { name: 'Rafael Souza', birth_date: '1988-07-25', email: 'rafael.souza@example.com' },
-                    ]} />
+                    <DashboardPatientsList 
+                        isDoctors={true}
+                        title='Seus Pacientes'
+                        patients={[
+                            { name: 'Lucas Ferreira', birth_date: '1990-05-15', email: 'lucas.ferreira@example.com' },
+                            { name: 'Mariana Silva', birth_date: '1985-08-22', email: 'mariana.silva@example.com' },
+                            { name: 'Pedro Gomes', birth_date: '1978-11-30', email: 'pedro.gomes@example.com' },
+                            { name: 'Ana Costa', birth_date: '1992-03-10', email: 'ana.costa@example.com' },
+                            { name: 'Rafael Souza', birth_date: '1988-07-25', email: 'rafael.souza@example.com' },
+                        ]} 
+                    />
                 </div>
             </div>
         </AppLayout>

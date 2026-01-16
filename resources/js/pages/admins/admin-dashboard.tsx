@@ -93,11 +93,11 @@ export default function AdminDashboard({
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                             <DashboardSchedule events={[
-                                { id: 1, time: '09:00', title: 'Consulta Dr. Silva', description: 'Paciente Maria Costa' },
-                                { id: 2, time: '10:30', title: 'Consulta Dra. Santos', description: 'Paciente João Oliveira' },
-                                { id: 3, time: '14:00', title: 'Consulta Dr. Lima', description: 'Paciente Ana Souza' },
-                                { id: 4, time: '15:30', title: 'Consulta Dra. Pereira', description: 'Paciente Carlos Mendes' },
-                                { id: 5, time: '16:00', title: 'Consulta Dr. Costa', description: 'Paciente Paula Alves' },
+                                { id: 1, time: '09:00', title: 'Consulta Dr. Silva', description: 'Paciente Maria Costa', date: '2026-01-20' },
+                                { id: 2, time: '10:30', title: 'Consulta Dra. Santos', description: 'Paciente João Oliveira', date: '2026-01-20' },
+                                { id: 3, time: '14:00', title: 'Consulta Dr. Lima', description: 'Paciente Ana Souza', date: '2026-01-20' },
+                                { id: 4, time: '15:30', title: 'Consulta Dra. Pereira', description: 'Paciente Carlos Mendes', date: '2026-01-20' },
+                                { id: 5, time: '16:00', title: 'Consulta Dr. Costa', description: 'Paciente Paula Alves', date: '2026-01-20' },
                             ]} />
                             <DashboardPatientsTrend 
                                 title="Evolução de pacientes"
