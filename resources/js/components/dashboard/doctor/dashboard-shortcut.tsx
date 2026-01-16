@@ -23,9 +23,10 @@ export default function DashboardShortcut({ shortcuts }: DashboardShortcutProps)
                   <div className="flex w-full gap-4">
                      {shortcuts.map((shortcut) => (
                      <Link 
+                        key={shortcut.title}
                         href={shortcut.route}
                         title={shortcut.title}
-                        className="p-3 bg-digital-blue-100 border-1 rounded-radius hover:bg-digital-blue-200/70 cursor-pointer transition-colors w-full flex justify-between items-center"
+                        className="p-3 bg-digital-blue-100 border-1 rounded-radius hover:bg-digital-blue-200/70 cursor-pointer transition-colors w-full flex justify-center gap-2 items-center"
                      > 
                         <shortcut.icon />
                         <p className="font-medium">{shortcut.title}</p>
