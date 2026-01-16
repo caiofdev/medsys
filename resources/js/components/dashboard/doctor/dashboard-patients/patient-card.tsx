@@ -2,6 +2,7 @@ import { Avatar } from '@radix-ui/react-avatar';
 import {  ClipboardList } from 'lucide-react';
 
 export interface PatientCardProps {
+   isDoctors?: boolean;
    patient: {
       name: string;
       birth_date: string;
@@ -9,7 +10,7 @@ export interface PatientCardProps {
    };
 }
 
-export default function PatientCard({ patient }: PatientCardProps) {
+export default function PatientCard({ patient, isDoctors }: PatientCardProps) {
    const patientAge = new Date().getFullYear() - new Date(patient.birth_date).getFullYear();
    return (
       <div className="flex bg-digital-blue-100 rounded-radius px-4 py-3 items-center border border-border justify-between">
@@ -23,12 +24,14 @@ export default function PatientCard({ patient }: PatientCardProps) {
                <span className="text-gray-500 text-xs font-mono truncate max-w-[160px]">{patient.email}</span>
             </div>
          </div>
+         {isDoctors && (
          <button
             className="flex items-center justify-center rounded-full p-2 bg-digital-blue-50 text-digital-blue-700 cursor-pointer"
             title="Ver prontuário"
          >
             <ClipboardList size={20} />
          </button>
+         )}
       </div>
    );
 }

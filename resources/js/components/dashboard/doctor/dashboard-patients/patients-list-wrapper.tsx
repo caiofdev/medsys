@@ -5,6 +5,8 @@ import 'swiper/css';
 import 'swiper/css/scrollbar';
 
 interface DashboardPatientsListProps {
+   title: string;
+   isDoctors: boolean;
    patients: {
       name: string;
       birth_date: string;
@@ -12,11 +14,11 @@ interface DashboardPatientsListProps {
    }[]
 }
 
-export default function DashboardPatientsList({patients}: DashboardPatientsListProps) {
+export default function DashboardPatientsList({patients, title, isDoctors}: DashboardPatientsListProps) {
    return (
       <div className="rounded-radius bg-digital-blue-50 border border-border flex flex-col h-full">
          <div className="p-4 border-b border-border">
-            <h2 className="text-xl font-bold text-darktext">Seus pacientes</h2>
+            <h2 className="text-xl font-bold text-darktext">{title}</h2>
             <p className="text-sm text-gray-500 mt-1">{patients.length} {patients.length === 1 ? 'paciente' : 'pacientes'}</p>
          </div>
          <div className="flex-1 p-4 overflow-hidden">
@@ -32,7 +34,7 @@ export default function DashboardPatientsList({patients}: DashboardPatientsListP
                >
                   {patients.map((patient, index) => (
                      <SwiperSlide key={index} style={{ height: 'auto' }}>
-                        <PatientCard patient={patient} />
+                        <PatientCard patient={patient} isDoctors={isDoctors} />
                      </SwiperSlide>
                   ))}
                </Swiper>
