@@ -25,11 +25,11 @@ class StartConsultation
         $appointments = Appointment::where('doctor_id', $doctor->id)
             ->where('status', 'scheduled')
             ->whereDate('appointment_date', today())
-            ->with(['patient.user'])
+            ->with(['patient']) // ✅ Apenas 'patient'
             ->orderBy('appointment_date', 'asc')
             ->get();
 
-        $patients = Patient::with('user')->get();
+        $patients = Patient::all();
 
         return [
             'appointments' => $appointments,

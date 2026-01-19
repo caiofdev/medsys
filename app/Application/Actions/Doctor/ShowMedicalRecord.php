@@ -18,11 +18,11 @@ class ShowMedicalRecord
      * @param int $patientId Patient ID
      * @return array
      */
-     public function execute(int $doctorId, int $patientId): array
+    public function execute(int $doctorId, int $patientId): array
     {
         $doctor = $this->doctorRepository->findById($doctorId);
         
-        $patient = Patient::with('user')->findOrFail($patientId);
+        $patient = Patient::findOrFail($patientId);
         
         $consultations = $this->doctorRepository->getPatientConsultations($doctorId, $patientId)
             ->map(function ($consultation) {
@@ -37,25 +37,10 @@ class ShowMedicalRecord
             });
 
         $medicalHistory = [
-            'allergies' => [
-                'Penicilina',
-                'Ácido acetilsalicílico (AAS)',
-                'Amendoim'
-            ],
-            'medications' => [
-                'Losartana 50mg - 1x ao dia',
-                'Metformina 500mg - 2x ao dia',
-                'Omeprazol 20mg - 1x ao dia'
-            ],
-            'conditions' => [
-                'Hipertensão arterial',
-                'Diabetes tipo 2',
-                'Gastrite crônica'
-            ],
-            'surgeries' => [
-                'Apendicectomia (2018)',
-                'Colecistectomia laparoscópica (2020)'
-            ]
+            'allergies' => ['Penicilina', 'Ácido acetilsalicílico (AAS)', 'Amendoim'],
+            'medications' => ['Losartana 50mg - 1x ao dia', 'Metformina 500mg - 2x ao dia'],
+            'conditions' => ['Hipertensão arterial', 'Diabetes tipo 2'],
+            'surgeries' => ['Apendicectomia (2018)', 'Colecistectomia laparoscópica (2020)']
         ];
 
         return [

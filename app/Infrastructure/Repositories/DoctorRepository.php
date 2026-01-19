@@ -6,6 +6,7 @@ use App\Domain\Contracts\DoctorRepositoryInterface;
 use App\Domain\Exceptions\DoctorNotFoundException;
 use App\Domain\Models\Doctor;
 use App\Domain\Models\User;
+use App\Domain\Models\Patient;
 use App\Domain\Models\Consultation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -104,11 +105,10 @@ class DoctorRepository implements DoctorRepositoryInterface
 
     public function getPatientsWithConsultations(int $doctorId)
     {
-        return User::whereHas('patient.appointments', function ($query) use ($doctorId) {
+        return Patient::whereHas('appointments', function ($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId)
                   ->where('status', 'completed');
         })
-        ->with(['patient'])
         ->distinct()
         ->get();
     }

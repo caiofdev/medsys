@@ -1,9 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
-
 import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -18,10 +16,9 @@ type LoginForm = {
 
 interface LoginProps {
     status?: string;
-    canResetPassword: boolean;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login({ status }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
@@ -60,11 +57,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <div className="grid gap-2">
                         <div className="flex items-center">
                             <Label htmlFor="password">Senha</Label>
-                            {canResetPassword && (
-                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                    Esqueceu sua senha?
-                                </TextLink>
-                            )}
                         </div>
                         <Input
                             id="password"
@@ -87,7 +79,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             onClick={() => setData('remember', !data.remember)}
                             tabIndex={3}
                         />
-                        <Label htmlFor="remember">Salvar credenciais</Label>
+                        <Label htmlFor="remember">Lembre de mim</Label>
                     </div>
 
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
@@ -97,7 +89,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 </div>
             </form>
 
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
+            {status && <div className="mb-4 text-center text-sm font-medium text-success">{status}</div>}
         </AuthCardLayout>
     );
 }

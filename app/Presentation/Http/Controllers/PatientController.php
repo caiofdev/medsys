@@ -2,108 +2,103 @@
 
 namespace App\Presentation\Http\Controllers;
 
-use App\Domain\Models\Patient;
+use App\Application\Actions\Patient\CreatePatient;
+use App\Application\Actions\Patient\UpdatePatient;
+use App\Application\Actions\Patient\DeletePatient;
+use App\Application\Actions\Patient\SearchPatient;
+use App\Application\Actions\Patient\ShowPatient;
+use App\Domain\Exceptions\PatientNotFoundException;
+use App\Presentation\Http\Controllers\Controller;
+use App\Presentation\Http\Requests\Patient\PatientStoreRequest;
+use App\Presentation\Http\Requests\Patient\PatientUpdateRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class PatientController extends Controller
 {
-    public function index(Request $request)
-    {
-        $search = $request->get('search', '');
-        
-        $patients = Patient::when($search, function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%");
-            })->paginate(8)->withQueryString();
+    public function __construct(
+        private CreatePatient $createPatient,
+        private UpdatePatient $updatePatient,
+        private DeletePatient $deletePatient,
+        private SearchPatient $searchPatient,
+        private ShowPatient $showPatient
+    ) {}
 
-        return Inertia::render('tables/patient-table', [
+    public function index(Request $request): Response
+    {
+        $search = $request->input('search');
+        
+        $patients = $this->searchPatient->execute($search, 8);
+
+        return Inertia::render('receptionists/patient-table', [
             'patients' => $patients,
-            'filters' => [
-                'search' => $search,
-            ],
+            'filters' => ['search' => $search],
             'userRole' => 'receptionist'
         ]);
     }
 
-    public function store(Request $request)
+    public function store(PatientStoreRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:patients,email',
-            'cpf' => 'required|string|max:14|unique:patients,cpf',
-            'phone' => 'required|string|max:20',
-            'gender' => 'required|in:male,female,other',
-            'birth_date' => 'required|date',
-            'emergency_contact' => 'required|string|max:20',
-            'medical_history' => 'nullable|string',
-        ]);
-
         try {
-            $patient = Patient::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'cpf' => $validated['cpf'],
-                'phone' => $validated['phone'],
-                'gender' => $validated['gender'],
-                'birth_date' => $validated['birth_date'],
-                'emergency_contact' => $validated['emergency_contact'],
-                'medical_history' => $validated['medical_history'] ?? '',
-            ]);
+            $this->createPatient->execute($request->validated());
 
             return back()->with('success', 'Paciente criado com sucesso.');
+                
         } catch (\Exception $e) {
             return back()->withErrors(['message' => 'Erro ao criar paciente: ' . $e->getMessage()]);
         }
     }
 
-    public function show(Patient $patient)
+    public function show(int $id): JsonResponse
     {
-        return response()->json([
-            'id' => $patient->id,
-            'name' => $patient->name,
-            'email' => $patient->email,
-            'cpf' => $patient->cpf,
-            'phone' => $patient->phone,
-            'gender' => $patient->gender,
-            'birth_date' => $patient->birth_date,
-            'emergency_contact' => $patient->emergency_contact,
-            'medical_history' => $patient->medical_history,
-        ]);
+        try {
+            $patient = $this->showPatient->execute($id);
+
+            return response()->json([
+                'id' => $patient->id,
+                'name' => $patient->name,
+                'email' => $patient->email,
+                'cpf' => $patient->cpf,
+                'phone' => $patient->phone,
+                'gender' => $patient->gender,
+                'birth_date' => $patient->birth_date,
+                'emergency_contact' => $patient->emergency_contact,
+                'medical_history' => $patient->medical_history,
+            ]);
+            
+        } catch (PatientNotFoundException $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
     }
 
-    public function update(Request $request, Patient $patient)
+    public function update(PatientUpdateRequest $request, int $id): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:patients,email,' . $patient->id,
-            'phone' => 'required|string|max:20',
-            'gender' => 'nullable|in:male,female,other',
-            'emergency_contact' => 'nullable|string|max:20',
-            'medical_history' => 'nullable|string',
-        ]);
-
         try {
-            $patient->update([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'gender' => $validated['gender'] ?? $patient->gender,
-                'emergency_contact' => $validated['emergency_contact'] ?? $patient->emergency_contact,
-                'medical_history' => $validated['medical_history'] ?? $patient->medical_history,
-            ]);
+            $this->updatePatient->execute($id, $request->validated());
 
             return back()->with('success', 'Paciente atualizado com sucesso.');
+                
+        } catch (PatientNotFoundException $e) {
+            return back()->withErrors(['message' => 'Paciente não encontrado.']);
+            
         } catch (\Exception $e) {
             return back()->withErrors(['message' => 'Erro ao atualizar paciente: ' . $e->getMessage()]);
         }
     }
 
-    public function destroy(Patient $patient)
+    public function destroy(int $id): RedirectResponse
     {
         try {
-            $patient->delete();
-            
+            $this->deletePatient->execute($id);
+
             return back()->with('success', 'Paciente deletado com sucesso.');
+                
+        } catch (PatientNotFoundException $e) {
+            return back()->withErrors(['message' => 'Paciente não encontrado.']);
+            
         } catch (\Exception $e) {
             return back()->withErrors(['message' => 'Erro ao deletar paciente: ' . $e->getMessage()]);
         }
