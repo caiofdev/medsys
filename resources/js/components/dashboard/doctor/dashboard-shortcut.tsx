@@ -20,7 +20,7 @@ export default function DashboardShortcut({ shortcuts }: DashboardShortcutProps)
             <h3 className="text-xl font-bold text-darktext mb-2">Atalhos Rápidos</h3>
             <div className="flex items-center gap-1cursor-pointer" >
                <div className="flex flex-col gap-2 w-full text-digital-blue-800">
-                  <div className="flex w-full gap-4">
+                  <div className="flex flex-col xl:flex-row w-full gap-4">
                      {shortcuts.map((shortcut) => (
                      <Link 
                         key={shortcut.title}

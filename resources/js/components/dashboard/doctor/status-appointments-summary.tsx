@@ -48,13 +48,13 @@ export default function StatusAppointmentsSummary({
    });
 
    return (
-   <div className="bg-digital-blue-50 rounded-radius border border-border shadow-sm p-6 w-full h-full flex flex-col">
+   <div className="bg-digital-blue-50 rounded-radius border border-border shadow-sm p-4 sm:p-6 w-full max-w-full flex flex-col min-h-[260px]">
       <h2 className="font-bold text-digital-blue-900 text-lg mb-4">
          {title}
       </h2>
 
-      <div className="flex-1">
-         <ResponsiveContainer width="100%" height="100%">
+      <div className="flex-1 min-h-[180px] max-w-full">
+         <ResponsiveContainer width="100%" height={180} minWidth={0} minHeight={120}>
          <BarChart
             data={data}
             margin={{ top: 20, right: 16, left: 0, bottom: 0 }}
