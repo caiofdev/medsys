@@ -1289,7 +1289,7 @@ function ModalAppointment({ receptionist, patients, doctors }: { receptionist: U
                         <button
                             className="bg-foreground text-white text-base px-5 py-1 rounded hover:scale-105 transition cursor-pointer hover:bg-success"
                             onClick={handleCreateAppointment}
-                            disabled={!selectedPatient || !selectedDoctor}
+                            disabled={!selectedDoctor}
                         >
                             Agendar
                         </button>
