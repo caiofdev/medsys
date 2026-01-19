@@ -1,7 +1,7 @@
 FROM php:8.5-fpm
 
 # Arguments
-ARG user=medsys
+ARG user=sail
 ARG uid=1000
 
 # Install system dependencies

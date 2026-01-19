@@ -21,7 +21,7 @@ class FileUploadService
         return false;
     }
 
-    public function update(?string $oldPath, UploadedFile $newFile, string $directory = 'uploads'): stream_set_blocking
+    public function update(?string $oldPath, UploadedFile $newFile, string $directory = 'uploads'): string
     {
         if ($oldPath) {
             $this->delete($oldPath);
