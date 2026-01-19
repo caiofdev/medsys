@@ -46,7 +46,7 @@ class DashboardController extends Controller
         $user = auth()->user();
         $dashboardData = $this->getAdminDashboardData->execute($user);
 
-        return Inertia::render('dashboards/admin-dashboard', array_merge(
+        return Inertia::render('admins/admin-dashboard', array_merge(
             $dashboardData, 
             ['userRole' => 'admin']
         ));
@@ -57,7 +57,7 @@ class DashboardController extends Controller
         $user = auth()->user();
         $dashboardData = $this->getDoctorDashboardData->execute($user);
 
-        return Inertia::render('dashboards/doctor-dashboard', array_merge(
+        return Inertia::render('doctors/doctor-dashboard', array_merge(
             $dashboardData, 
             ['userRole' => 'doctor']
         ));
@@ -68,7 +68,7 @@ class DashboardController extends Controller
         $user = auth()->user();
         $dashboardData = $this->getReceptionistDashboardData->execute($user);
 
-        return Inertia::render('dashboards/receptionist-dashboard', array_merge(
+        return Inertia::render('receptionists/receptionist-dashboard', array_merge(
             $dashboardData, 
             ['userRole' => 'receptionist']
         ));

@@ -3,7 +3,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import SearchBox from '@/components/ui/search-box';
-import { faClock, faUser, faUserMd, faStethoscope, faCalendar, faCoins, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faUserMd, faCalendar, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Pagination from '@/components/pagination';
 
@@ -72,21 +72,6 @@ interface PaginationLink {
     active: boolean;
 }
 
-function getStatusBadge(status: string) {
-    const statusMap = {
-        scheduled: { text: 'Agendado', class: 'bg-blue-100 text-blue-800' },
-        completed: { text: 'Concluído', class: 'bg-green-100 text-green-800' },
-        canceled: { text: 'Cancelado', class: 'bg-red-100 text-red-800' },
-    };
-    
-    const statusInfo = statusMap[status as keyof typeof statusMap] || { text: status, class: 'bg-gray-100 text-gray-800' };
-    
-    return (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusInfo.class}`}>
-            {statusInfo.text}
-        </span>
-    );
-}
 
 function formatDate(dateString: string) {
     return new Date(dateString).toLocaleDateString('pt-BR', {
@@ -115,16 +100,19 @@ export default function ConsultationsList({ consultations, filters }: Consultati
 
             return () => clearTimeout(delayedSearch);
         }
-    }, [searchValue]);
+    }, [searchValue, filters.search]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs} userRole='receptionist'>
             <Head title="Lista de Consultas" />
             
-            <div className="flex flex-col ml-30 mr-30 items-center justify-center">
+            <div className="flex flex-col ml-20 mr-20 mt-10 items-center justify-center">
                 <div className="w-full flex flex-col">
-                    <div className="flex w-full justify-between items-center mb-4">
-                        <h1 className="text-2xl font-bold text-[#030D29]">Lista de Consultas</h1>
+                    <div className="flex w-full justify-between items-center mb-2">
+                        <div>
+                            <h1 className="text-3xl font-bold text-foreground">Lista de Consultas</h1>
+                            <p className="text-gray-500 text-base mt-1">Aqui estão todas as consultas já realizadas e registradas no sistema.</p>
+                        </div>
                         <div className="w-1/3">
                             <SearchBox
                                 placeHolder="Buscar por paciente ou doutor..."
@@ -134,67 +122,77 @@ export default function ConsultationsList({ consultations, filters }: Consultati
                         </div>
                     </div>
 
-                    <table className="w-full text-left items-center">  
-                        <thead>
-                            <tr className="flex bg-[#030D29] text-white font-bold mb-2 rounded-md items-center justify-center">
-                                <th className="w-full p-3">ID</th>
-                                <th className="w-full p-3"> Paciente </th>
-                                <th className="w-full p-3"> Doutor </th>
-                                <th className="w-full p-3"> Data </th>
-                                <th className="w-full p-3"> Valor </th>
-                                <th className="w-full p-3 rounded-r-md text-center"> Status </th>
+                    <div className="overflow-x-auto rounded-xl border border-border bg-white shadow-sm">
+                        <table className="min-w-full text-sm">
+                            <thead className="sticky top-0 z-10 bg-foreground text-white">
+                            <tr>
+                                <th className="px-6 py-3 text-left font-semibold w-16">#</th>
+
+                                <th className="px-6 py-3 text-left font-semibold">
+                                <FontAwesomeIcon icon={faUser} className="mr-2 opacity-80" />
+                                Paciente
+                                </th>
+
+                                <th className="px-6 py-3 text-left font-semibold">
+                                <FontAwesomeIcon icon={faUserMd} className="mr-2 opacity-80" />
+                                Doutor
+                                </th>
+
+                                <th className="px-6 py-3 text-left font-semibold">
+                                <FontAwesomeIcon icon={faCalendar} className="mr-2 opacity-80" />
+                                Data
+                                </th>
+
+                                <th className="px-6 py-3 text-right font-semibold">
+                                <FontAwesomeIcon icon={faMoneyBill} className="mr-2 opacity-80" />
+                                Valor
+                                </th>
                             </tr>
-                        </thead>
-                        <tbody>
+                            </thead>
+
+                            <tbody>
                             {consultations.data.length > 0 ? (
                                 consultations.data.map((consultation) => (
-                                    <tr key={consultation.id} className="flex bg-white shadow-sm rounded mb-2 hover:bg-gray-50 transition-colors">
-                                        <td className="w-full p-3 rounded-l-md text-[#030D29]">
-                                            {consultation.id}
-                                        </td>
-                                        <td className="w-full p-3">
-                                            <div className="flex flex-col">
-                                                <span className="text-[#030D29]">
-                                                    {consultation.appointment.patient.name}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="w-full p-3">
-                                            <span className="text-[#030D29]">
-                                                {consultation.appointment.doctor.user.name}
-                                            </span>
-                                        </td>
-                                        <td className="w-full p-3">
-                                            <div className="flex flex-col">
-                                                <span className="text-[#030D29]">
-                                                    {formatDate(consultation.appointment.appointment_date)}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="w-full p-3">
-                                            <div className="flex flex-col">
-                                                <span className="text-[#030D29]">
-                                                    R$ {consultation.appointment.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="w-full p-3 rounded-r-md flex justify-center items-center">
-                                            {getStatusBadge(consultation.appointment.status)}
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr className="flex bg-white shadow-sm rounded mb-2">
-                                    <td colSpan={5} className="w-full p-8 text-center text-gray-500 rounded-md">
-                                        {searchValue ? 
-                                            `Nenhuma consulta encontrada para "${searchValue}"` : 
-                                            'Nenhuma consulta encontrada'
-                                        }
+                                <tr key={consultation.id} className="border-b last:border-b-0">
+                                    <td className="px-6 py-3 font-medium text-darktext">
+                                    {consultation.id}
+                                    </td>
+
+                                    <td className="px-6 py-3 text-darktext">
+                                    {consultation.appointment.patient.name}
+                                    </td>
+
+                                    <td className="px-6 py-3 text-darktext">
+                                    {consultation.appointment.doctor.user.name}
+                                    </td>
+
+                                    <td className="px-6 py-3 text-darktext whitespace-nowrap">
+                                    {formatDate(consultation.appointment.appointment_date)}
+                                    </td>
+
+                                    <td className="px-6 py-3 text-right font-medium text-darktext whitespace-nowrap">
+                                    R$ {consultation.appointment.value.toLocaleString('pt-BR', {
+                                        minimumFractionDigits: 2,
+                                    })}
                                     </td>
                                 </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                <td
+                                    colSpan={5}
+                                    className="px-6 py-12 text-center text-gray-500"
+                                >
+                                    {searchValue
+                                    ? `Nenhuma consulta encontrada para "${searchValue}"`
+                                    : 'Nenhuma consulta encontrada'}
+                                </td>
+                                </tr>
                             )}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
+
                     <Pagination
                         links={consultations.links}
                         currentPage={consultations.current_page}
