@@ -1,5 +1,4 @@
 <?php
-// filepath: app/Infrastructure/Repositories/DashboardRepository.php
 
 namespace App\Infrastructure\Repositories;
 
@@ -10,6 +9,7 @@ use App\Domain\Models\Appointment;
 use App\Domain\Models\Consultation;
 use App\Domain\Models\Doctor;
 use App\Domain\Models\Receptionist;
+use App\Domain\Models\Patient;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -209,5 +209,62 @@ class DashboardRepository implements DashboardRepositoryInterface
                 ];
             })
             ->toArray();
+    }
+
+    public function getPatients($doctorId = null): array
+    {
+        $query = Patient::query();
+    
+        if ($doctorId) {
+            $query->whereHas('appointments', function($q) use ($doctorId) {
+                $q->where('doctor_id', $doctorId);
+            });
+        } else {
+            $query->whereHas('appointments');
+        }
+    
+        return $query->get(['id', 'name', 'birth_date', 'email'])->toArray();
+    }
+
+    public function getDoctorConsultationsSummary(int $doctorId): array
+    {
+        $today = now()->toDateString();
+        $weekStart = now()->startOfWeek();
+        $weekEnd = now()->endOfWeek();
+        $monthStart = now()->startOfMonth();
+        $monthEnd = now()->endOfMonth();
+
+        return [
+            'today' => Appointment::where('doctor_id', $doctorId)
+                ->whereDate('appointment_date', $today)
+                ->count(),
+            'week' => Appointment::where('doctor_id', $doctorId)
+                ->whereBetween('appointment_date', [$weekStart, $weekEnd])
+                ->count(),
+            'month' => Appointment::where('doctor_id', $doctorId)
+                ->whereBetween('appointment_date', [$monthStart, $monthEnd])
+                ->count(),
+        ];
+    }
+
+    public function getDoctorWeeklyAppointmentsStatus(int $doctorId): array
+    {
+        $weekStart = now()->startOfWeek();
+        $weekEnd = now()->endOfWeek();
+
+        return [
+            'completed' => Appointment::where('doctor_id', $doctorId)
+                ->whereBetween('appointment_date', [$weekStart, $weekEnd])
+                ->where('status', 'completed')
+                ->count(),
+            'scheduled' => Appointment::where('doctor_id', $doctorId)
+                ->whereBetween('appointment_date', [$weekStart, $weekEnd])
+                ->where('status', 'scheduled')
+                ->count(),
+            'canceled' => Appointment::where('doctor_id', $doctorId)
+                ->whereBetween('appointment_date', [$weekStart, $weekEnd])
+                ->where('status', 'canceled')
+                ->count(),
+        ];
     }
 }

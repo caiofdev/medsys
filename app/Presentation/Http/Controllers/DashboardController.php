@@ -109,5 +109,13 @@ class DashboardController extends Controller
             'userRole' => 'receptionist',
         ]);
     }
-    
+
+    public function doctorPatients(): Response
+    {
+        $doctorId = auth()->user()->doctor->id ?? null;
+        $patients = $this->dashboardRepository->getPatients($doctorId);
+        return Inertia::render('doctors/doctor-dashboard', [
+            'patients' => $patients,
+        ]);
+    }
 }

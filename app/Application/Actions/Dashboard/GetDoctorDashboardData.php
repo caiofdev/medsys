@@ -26,16 +26,28 @@ class GetDoctorDashboardData
 
         $upcomingAppointments = $this->dashboardRepository->getDoctorUpcomingAppointments($doctor->id);
 
+        $summary = $this->dashboardRepository->getDailySummary();
+
+        $consultationsSummary = $this->dashboardRepository->getDoctorConsultationsSummary($doctor->id);
+        
+        $weeklyAppointmentsStatus = $this->dashboardRepository->getDoctorWeeklyAppointmentsStatus($doctor->id);
+
+        $patients = $this->dashboardRepository->getPatients($doctor->id);
+
         return [
             'user' => [
                 'name' => $user->name,
                 'avatar' => $user->photo ? asset('storage/' . $user->photo) : '/doctor-pic.png',
                 'role' => 'DOUTOR',
                 'crm' => $doctor->crm ?? null,
-                'specialty' => 'Clínico Geral', // ✅ Valor padrão
+                'specialty' => 'Clínico Geral',
             ],
             'appointments' => $appointmentCounts,
             'upcoming_appointments' => $upcomingAppointments,
+            'daily_summary' => $summary,
+            'consultations_summary' => $consultationsSummary,
+            'weekly_appointments_status' => $weeklyAppointmentsStatus,
+            'patients' => $patients
         ];
     }
 }

@@ -14,7 +14,7 @@ export default function DashboardConsultationsSummary({ todayConsultations, week
    return (
       <div className="bg-digital-blue-50 rounded-radius shadow p-6 flex flex-col gap-4">
          <p className="font-bold text-digital-blue-900 text-xl mb-1">Resumo de Consultas</p>
-         <div className="flex gap-4 justify-between">
+         <div className="flex gap-4 justify-between lg:justify-center">
             {cards.map((card) => (
                <div
                   key={card.label}

@@ -4,6 +4,7 @@ import {  ClipboardList } from 'lucide-react';
 export interface PatientCardProps {
    isDoctors?: boolean;
    patient: {
+      id: number;
       name: string;
       birth_date: string;
       email: string;
@@ -25,12 +26,14 @@ export default function PatientCard({ patient, isDoctors }: PatientCardProps) {
             </div>
          </div>
          {isDoctors && (
-         <button
+         <a
+            href={`/doctor/medical-record/${patient.id}`}
             className="flex items-center justify-center rounded-full p-2 bg-digital-blue-50 text-digital-blue-700 cursor-pointer"
             title="Ver prontuário"
+            
          >
             <ClipboardList size={20} />
-         </button>
+         </a>
          )}
       </div>
    );

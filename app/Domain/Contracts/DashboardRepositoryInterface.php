@@ -23,6 +23,12 @@ interface DashboardRepositoryInterface
     public function getConsultationsList(?string $search = null, int $perPage = 10);
 
     public function getSemesterRevenueData(): array;
-    
+
     public function getAllSystemUsers(): array;
+
+    public function getPatients(int $doctorId): array;
+
+    public function getDoctorConsultationsSummary(int $doctorId): array;
+
+    public function getDoctorWeeklyAppointmentsStatus(int $doctorId): array;
 }

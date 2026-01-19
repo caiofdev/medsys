@@ -37,9 +37,25 @@ interface DoctorDashboardProps {
         };
         status: string;
     }>;
+    patients: Array<{
+        id: number;
+        name: string;
+        birth_date: string;
+        email: string;
+    }>;
+    consultations_summary: {
+        today: number;
+        week: number;
+        month: number;
+    };
+    weekly_appointments_status: {
+        completed: number;
+        scheduled: number;
+        canceled: number;
+    };
 }
 
-export default function DoctorDashboard({ user,  upcoming_appointments }: DoctorDashboardProps) {
+export default function DoctorDashboard({ user,  upcoming_appointments, patients = [], consultations_summary, weekly_appointments_status }: DoctorDashboardProps) {
     return (
     <AppLayout breadcrumbs={breadcrumbs} userRole="doctor">
         <Head title="Doctor Dashboard" />
@@ -47,18 +63,18 @@ export default function DoctorDashboard({ user,  upcoming_appointments }: Doctor
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-5 min-h-screen p-4 md:p-0">
                     <div className="flex flex-col gap-4">
                         <DashboardHeader userName={user.name} />
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 h-fit">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 h-fit">
                                 <DashboardShortcut shortcuts={[
                                     { icon: Play, title: 'Iniciar Consulta', route: '/doctor/start-consultation' },
                                     { icon: ClipboardList, title: 'Ver Prontuários', route: '/doctor/medical-record' },
                                 ]} />
                                 <DashboardConsultationsSummary
-                                    todayConsultations={3}
-                                    weekConsultations={11}
-                                    monthConsultations={41}
+                                    todayConsultations={consultations_summary.today}
+                                    weekConsultations={consultations_summary.week}
+                                    monthConsultations={consultations_summary.month}
                                 />
                         </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                             <DashboardSchedule events={upcoming_appointments
                                 .filter(appointment => appointment.status !== 'canceled' )
                                 .map(appointment => ({
@@ -68,19 +84,13 @@ export default function DoctorDashboard({ user,  upcoming_appointments }: Doctor
                                     title: `Consulta: ${appointment.patient.name}`,
                                 }))
                             } />
-                            <StatusAppointmentsSummary title="Status das Consultas da Semana" completed={5} scheduled={10} canceled={2} />
+                            <StatusAppointmentsSummary title="Status das Consultas da Semana" completed={weekly_appointments_status.completed} scheduled={weekly_appointments_status.scheduled} canceled={weekly_appointments_status.canceled} />
                         </div>
                     </div>
                     <DashboardPatientsList 
                         isDoctors={true}
-                        title='Seus Pacientes'
-                        patients={[
-                            { name: 'Lucas Ferreira', birth_date: '1990-05-15', email: 'lucas.ferreira@example.com' },
-                            { name: 'Mariana Silva', birth_date: '1985-08-22', email: 'mariana.silva@example.com' },
-                            { name: 'Pedro Gomes', birth_date: '1978-11-30', email: 'pedro.gomes@example.com' },
-                            { name: 'Ana Costa', birth_date: '1992-03-10', email: 'ana.costa@example.com' },
-                            { name: 'Rafael Souza', birth_date: '1988-07-25', email: 'rafael.souza@example.com' },
-                        ]} 
+                        title="Seus Pacientes"
+                        patients={patients}
                     />
                 </div>
             </div>

@@ -8,6 +8,7 @@ interface DashboardPatientsListProps {
    title: string;
    isDoctors: boolean;
    patients: {
+      id: number;
       name: string;
       birth_date: string;
       email: string;
@@ -16,7 +17,7 @@ interface DashboardPatientsListProps {
 
 export default function DashboardPatientsList({patients, title, isDoctors}: DashboardPatientsListProps) {
    return (
-      <div className="rounded-radius bg-digital-blue-50 border border-border flex flex-col h-full">
+      <div className="rounded-radius bg-digital-blue-50 border border-border flex flex-col h-full max-h-310 xl:max-h-173.5">
          <div className="p-4 border-b border-border">
             <h2 className="text-xl font-bold text-darktext">{title}</h2>
             <p className="text-sm text-gray-500 mt-1">{patients.length} {patients.length === 1 ? 'paciente' : 'pacientes'}</p>
