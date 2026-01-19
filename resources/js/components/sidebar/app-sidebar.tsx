@@ -3,7 +3,7 @@ import { NavUser } from '@/components/sidebar/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/sidebar/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Users, UserCheck, Stethoscope, Shield, ClipboardList, Play, ClipboardPlus, Calendar } from 'lucide-react';
+import { LayoutGrid, Users, UserCheck, Stethoscope, Shield, ClipboardList, Play, ClipboardPlus } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 
 type UserRole = 'admin' | 'doctor' | 'receptionist' | 'patient';
@@ -13,11 +13,6 @@ const adminNavItems: NavItem[] = [
         title: 'Dashboard',
         href: '/admin/dashboard',
         icon: LayoutGrid,
-    },
-    {
-        title: 'Calendário',
-        href: '/calendar',
-        icon: Calendar,
     },
     {
         title: 'Admins',
@@ -43,11 +38,6 @@ const doctorNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Calendário',
-        href: '/calendar',
-        icon: Calendar,
-    },
-    {
         title: 'Iniciar Atendimento',
         href: '/doctor/start-consultation',
         icon: Play,
@@ -66,16 +56,10 @@ const receptionistNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Calendário',
-        href: '/calendar',
-        icon: Calendar,
-    },
-    {
         title: 'Pacientes',
         href: '/receptionist/patients',
         icon: Users,
     },
-
     {
         title: 'Visualizar Consultas',
         href: '/receptionist/consultations-list',
