@@ -3,9 +3,9 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Doctor;
-use App\Models\Patient;
-use App\Models\Receptionist;
+use App\Domain\Models\Doctor;
+use App\Domain\Models\Patient;
+use App\Domain\Models\Receptionist;
 
 class AppointmentFactory extends Factory
 {

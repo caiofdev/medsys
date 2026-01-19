@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Doctor;
+use App\Domain\Models\Doctor;
 use Illuminate\Database\Seeder;
 
 class DoctorSeeder extends Seeder
