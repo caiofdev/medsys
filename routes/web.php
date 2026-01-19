@@ -67,16 +67,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('start-consultation', [DoctorController::class, 'startConsultation'])->name('start-consultation');
         Route::post('finish-consultation', [DoctorController::class, 'finishConsultation'])->name('finish-consultation');
     });
-    
-    Route::get('calendar', function () {
-        return Inertia::render('Calendar');
-    })->name('calendar');
-
-    Route::get('calendar/appointments', [AppointmentController::class, 'getCalendarAppointments'])->name('calendar.appointments');
-
-    Route::get('/csrf-token', function () {
-        return response()->json(['token' => csrf_token()]);
-    })->middleware('web');
 });
 
 require __DIR__.'/settings.php';
