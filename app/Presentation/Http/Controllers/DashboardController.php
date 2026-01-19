@@ -48,7 +48,10 @@ class DashboardController extends Controller
 
         return Inertia::render('admins/admin-dashboard', array_merge(
             $dashboardData, 
-            ['userRole' => 'admin']
+            [
+                'userRole' => 'admin',
+                'all_system_users' => $dashboardData['all_system_users'],
+            ]
         ));
     }
 
@@ -106,4 +109,5 @@ class DashboardController extends Controller
             'userRole' => 'receptionist',
         ]);
     }
+    
 }

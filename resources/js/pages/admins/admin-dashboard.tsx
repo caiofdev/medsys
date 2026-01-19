@@ -23,6 +23,12 @@ interface AdminDashboardProps {
         role: string;
         is_master: boolean;
     };
+    all_system_users: {
+        id: number;
+        name: string;
+        email: string;
+        role: string;
+    }[];
     stats: {
         total_admins: number;
         total_doctors: number;
@@ -65,6 +71,7 @@ export default function AdminDashboard({
     user,
     monthly_revenue,
     semester_revenue,
+    all_system_users
 }: AdminDashboardProps) {
     return (
     <AppLayout breadcrumbs={breadcrumbs} userRole="admin">
@@ -107,13 +114,7 @@ export default function AdminDashboard({
                             />
                         </div>
                     </div>
-                    <DashboardEmployees users={[
-                        { name: 'Lucas Ferreira', role: 'ADMINISTRADOR', avatar: '/avatars/lucas.png' },
-                        { name: 'Mariana Silva', role: 'RECEPCIONISTA', avatar: '/avatars/mariana.png' },
-                        { name: 'Pedro Gomes', role: 'MEDICO', avatar: '/avatars/pedro.png' },
-                        { name: 'Ana Costa', role: 'RECEPCIONISTA', avatar: '/avatars/ana.png' },
-                        { name: 'Rafael Souza', role: 'MEDICO', avatar: '/avatars/rafael.png' },
-                    ]} />
+                    <DashboardEmployees users={[...all_system_users]} />
                 </div>
             </div>
         </AppLayout>

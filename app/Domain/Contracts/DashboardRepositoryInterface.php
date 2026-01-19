@@ -1,5 +1,4 @@
 <?php
-// filepath: app/Domain/Contracts/DashboardRepositoryInterface.php
 
 namespace App\Domain\Contracts;
 
@@ -22,4 +21,8 @@ interface DashboardRepositoryInterface
     public function getDoctorUpcomingAppointments(int $doctorId): Collection;
 
     public function getConsultationsList(?string $search = null, int $perPage = 10);
+
+    public function getSemesterRevenueData(): array;
+    
+    public function getAllSystemUsers(): array;
 }

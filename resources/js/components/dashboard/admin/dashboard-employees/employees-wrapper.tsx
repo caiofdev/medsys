@@ -6,15 +6,16 @@ import 'swiper/css/scrollbar';
 
 interface DashboardEmployeesProps {
    users: {
+      id: number;
       name: string;
       role: string;
-      avatar: string;
+      email: string;
    }[]
 }
 
 export default function DashboardEmployees({users}: DashboardEmployeesProps) {
    return (
-      <div className="rounded-radius bg-digital-blue-50 border border-border flex flex-col h-full">
+      <div className="rounded-radius bg-digital-blue-50 border border-border flex flex-col h-full max-h-253 xl:max-h-228">
          <div className="p-4 border-b border-border">
             <h2 className="text-xl font-bold text-darktext">Equipe</h2>
             <p className="text-sm text-gray-500 mt-1">{users.length} {users.length === 1 ? 'funcionário' : 'funcionários'}</p>

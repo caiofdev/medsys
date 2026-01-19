@@ -22,15 +22,17 @@ class GetAdminDashboardData
     public function execute(User $user): array
     {
         $user->loadMissing('admin');
-
+        
         $usersCounts = $this->dashboardRepository->getSystemUsersCounts();
         $consultations = $this->dashboardRepository->getLastCompletedConsultations(5);
         $revenueData = $this->dashboardRepository->getMonthlyRevenueData();
-
+        $semesterRevenue = $this->dashboardRepository->getSemesterRevenueData();
         $totalUsers = $this->statisticsService->calculateTotalUsers($usersCounts);
         $monthlyRevenue = $this->statisticsService->calculateMonthlyRevenueGrowth($revenueData);
         $consultationsChart = $this->statisticsService->prepareConsultationsChartData($consultations);
         $revenueChart = $this->statisticsService->prepareMonthlyRevenueChartData($monthlyRevenue);
+        $allSystemUsers = $this->dashboardRepository->getAllSystemUsers();
+
 
         return [
             'user' => [
@@ -48,6 +50,12 @@ class GetAdminDashboardData
                 'chart_data' => $revenueChart['data'],
                 'chart_labels' => $revenueChart['labels'],
             ]),
+            'semester_revenue' => [
+                'revenue' => $semesterRevenue['revenue'],
+                'chart_data' => $semesterRevenue['chart_data'],
+                'chart_labels' => $semesterRevenue['chart_labels'],
+            ],
+            'all_system_users' => $allSystemUsers,
         ];
     }
 }

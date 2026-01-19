@@ -4,6 +4,7 @@
 namespace App\Infrastructure\Repositories;
 
 use App\Domain\Contracts\DashboardRepositoryInterface;
+use App\Domain\Models\User;
 use App\Domain\Models\Admin;
 use App\Domain\Models\Appointment;
 use App\Domain\Models\Consultation;
@@ -163,5 +164,50 @@ class DashboardRepository implements DashboardRepositoryInterface
             ->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function getSemesterRevenueData(): array
+    {
+        $labels = [];
+        $data = [];
+        $totalRevenue = 0;
+
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i)->startOfMonth();
+            $monthEnd = now()->subMonths($i)->endOfMonth();
+            $label = $month->format('M');
+
+            $revenue = Appointment::where('status', 'completed')
+                ->whereBetween('appointment_date', [$month, $monthEnd])
+                ->sum('value');
+
+            $labels[] = $label;
+            $data[] = (float) $revenue;
+            $totalRevenue += $revenue;
+        }
+
+        return [
+            'chart_labels' => $labels,
+            'chart_data' => $data,
+            'revenue' => $totalRevenue,
+        ];
+    }
+
+    public function getAllSystemUsers(): array
+    {
+        return User::with(['admin', 'doctor', 'receptionist'])
+            ->get()
+            ->map(function($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'avatar' => $user->photo,
+                    'role' => $user->admin ? 'admin' :
+                            ($user->doctor ? 'doctor' :
+                            ($user->receptionist ? 'receptionist' : 'patient'))
+                ];
+            })
+            ->toArray();
     }
 }

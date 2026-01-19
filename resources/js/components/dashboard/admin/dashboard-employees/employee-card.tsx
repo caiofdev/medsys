@@ -1,11 +1,11 @@
 import { Settings2 } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export interface EmployeeCardProps {
    user: {
       name: string;
       role: string;
-      avatar: string;
+      email: string;
    };
 }
 const colorsRole = {
@@ -15,9 +15,9 @@ const colorsRole = {
 };
 
 export default function EmployeeCard({ user }: EmployeeCardProps) {
-   const roleColors = user.role === 'ADMINISTRADOR' 
+   const roleColors = user.role === 'admin' 
       ? colorsRole.admin 
-      : user.role === 'MEDICO' 
+      : user.role === 'doctor' 
       ? colorsRole.doctor 
       : colorsRole.receptionist;
 
@@ -26,10 +26,6 @@ export default function EmployeeCard({ user }: EmployeeCardProps) {
          <div className='flex items-center gap-3'>
             <div className='w-fit rounded-full'>
                   <Avatar className='h-10 w-10'>
-                     <AvatarImage
-                        src={user.avatar}
-                        alt={user.name}
-                     />
                      <AvatarFallback className={`${roleColors.bg} text-white font-semibold`}>
                         {user.name.charAt(0)}
                      </AvatarFallback>
@@ -37,7 +33,7 @@ export default function EmployeeCard({ user }: EmployeeCardProps) {
             </div>
             <div className='flex flex-col justify-center'>
                   <p className="text-darktext font-semibold">{user.name}</p>
-                  <p className="text-gray-600 text-xs">{user.role}</p>
+                  <p className="text-gray-600 text-xs">{user.role === 'admin' ? 'Administrador' : user.role === 'doctor' ? 'Médico' : 'Recepcionista'}</p>
             </div>
          </div>
          <div className='flex-shrink-0'>
