@@ -33,7 +33,7 @@ class PatientController extends Controller
         
         $patients = $this->searchPatient->execute($search, 8);
 
-        return Inertia::render('tables/patient-table', [
+        return Inertia::render('receptionists/patient-table', [
             'patients' => $patients,
             'filters' => ['search' => $search],
             'userRole' => 'receptionist'

@@ -33,7 +33,7 @@ class ReceptionistController extends Controller
         
         $receptionists = $this->searchReceptionist->execute($search, 8);
 
-        return Inertia::render('tables/receptionist-table', [
+        return Inertia::render('receptionists/receptionist-table', [
             'receptionists' => $receptionists,
             'filters' => ['search' => $search],
             'userRole' => 'admin'

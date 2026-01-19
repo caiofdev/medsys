@@ -1,8 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { faUser, faCalendar, faPhone, faIdCard, faStethoscope, faVenusMars, faEye } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Calendar, Eye, User, VenusAndMars } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -62,7 +61,7 @@ interface MedicalRecordProps {
 }
 
 
-export default function MedicalRecordList({ patients, doctor, consultationData, userRole }: MedicalRecordProps) {
+export default function MedicalRecordList({ patients, consultationData }: MedicalRecordProps) {
 
     const calculateAge = (birthDate: string): number => {
         const today = new Date();
@@ -95,7 +94,7 @@ export default function MedicalRecordList({ patients, doctor, consultationData, 
 
     const formatConsultationDate = (consultation: ConsultationData | null): string => {
         if (!consultation) {
-            return 'Nenhuma consulta registrada';
+            return '-';
         }
         
         return new Date(consultation.appointment.appointment_date).toLocaleDateString('pt-BR');
@@ -109,7 +108,7 @@ export default function MedicalRecordList({ patients, doctor, consultationData, 
                     
                     {patients.length === 0 ? (
                         <div className="text-center py-12">
-                            <FontAwesomeIcon icon={faUser} className="text-gray-400 text-6xl mb-4" />
+                            <User size={50} />
                             <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum paciente encontrado</h3>
                             <p className="text-gray-500">Não há pacientes cadastrados no sistema.</p>
                         </div>
@@ -120,30 +119,30 @@ export default function MedicalRecordList({ patients, doctor, consultationData, 
                                 const patientAge = calculateAge(patient.birth_date);
                                 
                                 return (
-                                    <div key={patient.id} className="bg-[#F7F2EB] shadow-md rounded-lg p-5 hover:shadow-lg transition-shadow duration-200">
-                                        <div className="mb-4 flex justify-between items-center">
-                                            <div className="flex items-center w-fit">
-                                                <FontAwesomeIcon icon={faUser} className="text-[#030D29] mr-2" />
-                                                <span className="font-semibold text-lg">{patient.name}</span>
+                                    <div key={patient.id} className="bg-digital-blue-50 shadow-md rounded-lg p-5 hover:shadow-lg transition-shadow duration-200">
+                                        <div className="mb-4 flex justify-between items-center text-darktext">
+                                            <div className="flex items-center w-fit text-foreground">
+                                                <User size={22} className='mr-1'/>
+                                                <span className="font-semibold text-lg ">{patient.name}</span>
                                             </div>
-                                            <div className="flex items-center w-fit">
-                                                <FontAwesomeIcon icon={faVenusMars} className="text-gray-600 mr-2" />
-                                                <span className="text-gray-700">{patient.gender === 'male' ? 'Masculino' : 'Feminino'}, {patientAge} anos</span>
+                                            <div className="flex items-center w-fit text-gray-700">
+                                                <VenusAndMars size={20} className='mr-1'/>
+                                                <span>{patient.gender === 'male' ? 'Masculino' : patient.gender === 'female' ? 'Feminino' : 'Outro'}, {patientAge} anos</span>
                                             </div>
                                         </div>
-                                        <div className="border-t pt-4 flex justify-between">
+                                        <div className="border-t pt-4 flex justify-between  text-gray-700">
                                             <div className="flex items-center">
-                                                <FontAwesomeIcon icon={faCalendar} className="text-[#030D29] mr-2" />
+                                                <Calendar size={16} className='mr-1'/>
                                                 <span className="text-sm">
                                                     Última consulta: {formatConsultationDate(lastConsultation)}
                                                 </span>
                                             </div>
                                             <Link 
                                                 href={`/doctor/medical-record/${patient.id}`}
-                                                className="flex items-center pl-2 pr-2 pt-1 pb-1 rounded-md bg-[#030D29] text-[#F7F2EB] gap-2 hover:bg-[#030D29e1] hover:scale-102 transition-colors duration-200 cursor-pointer"
+                                                className="flex items-center pl-2 pr-2 pt-1 pb-1 rounded-md bg-foreground text-lighttext gap-2 hover:bg-digital-blue-700 hover:scale-102 transition-colors duration-200 cursor-pointer ring-outline-none focus:ring-1 focus:ring-white"
                                             >
-                                                <FontAwesomeIcon icon={faEye} />
-                                                <span className="text-base font-bold">Visualizar Prontuário</span>
+                                                <Eye size={20} />
+                                                <span className="text-sm">Visualizar Prontuário</span>
                                             </Link>
                                         </div>
                                     </div>

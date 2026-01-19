@@ -35,7 +35,7 @@ class AdminController extends Controller
         
         $admins = $this->searchAdmin->execute($search, 10);
 
-        return Inertia::render('tables/admin-table', [
+        return Inertia::render('admins/admin-table', [
             'admins' => $admins,
             'filters' => ['search' => $search],
         ]);

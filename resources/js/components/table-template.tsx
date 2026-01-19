@@ -1,6 +1,5 @@
 import { useState } from "react"
-import { faEye, faPencil, faTrashCan, faCirclePlus} from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Plus, Eye, PencilLine, Trash} from "lucide-react"
 import {Dialog} from "@/components/ui/dialog"
 import {ModalView, ModalEdit, ModalCreate, ModalDelete, ModalProvider} from "./modals"
 
@@ -87,56 +86,55 @@ export default function Table({ users, type}: TableProps) {
     };
 
     return (
-        <div className="flex flex-col ml-30 mr-30 items-center justify-center">
-            <div className="w-full flex flex-col">
-                <div className="flex w-full justify-start mb-0">
-                    <div 
-                        className="flex w-fit bg-[#030D29] text-white p-1 pr-2 pl-2 rounded-t-2xl m-0 border-b-1 border-[#ffffff1c] transition duration-200 cursor-pointer hover:bg-[#030D29e1]"
+        <div className="flex flex-col ml-25 mr-25 lg:ml-15 lg:mr-15 items-center justify-center">
+            <div className="w-full flex flex-col space-y-2">
+                <div className="flex w-full justify-end">
+                    <button
+                        className="flex items-center gap-2 bg-digital-blue-800 text-white px-5 py-2 rounded-lg shadow-md font-semibold text-sm hover:bg-digital-blue-700 hover:shadow-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-digital-blue-400 cursor-pointer"
                         onClick={() => handleAction(null, "create")}
                     >
-                        <div className="flex items-center justify-center m-0">
-                            <div className="flex p-2 text-sm">
-                                NOVO {type === "admin" ? "ADMINISTRADOR" : type === "receptionist" ? "RECEPCIONISTA" : type === "doctor" ? "DOUTOR" : "PACIENTE"}
-                            </div>
-                            <FontAwesomeIcon className="text-2xl" icon={faCirclePlus}/>
-                        </div>
-                    </div>
+                        <Plus />
+                        NOVO {type === "admin" ? "ADMINISTRADOR" : type === "receptionist" ? "RECEPCIONISTA" : type === "doctor" ? "DOUTOR" : "PACIENTE"}
+                    </button>
                 </div>
                 
                 <table className="w-full text-left items-center">  
                     <thead>
-                        <tr className="flex bg-[#030D29] text-white font-bold mb-2 rounded-b-md rounded-r-md items-center justify-center">
+                        <tr className="flex bg-foreground text-lighttext font-bold mb-2 rounded-radius rounded-r-radius items-center justify-center">
                             <th className="w-full p-3">ID</th>
                             <th className="w-full p-3">Nome</th>
                             <th className="w-full p-3">E-mail</th>
-                            <th className="flex w-full p-3 rounded-r-md justify-center items-center">Operações</th>
+                            <th className="flex w-full p-3 rounded-r-radius justify-center items-center">Operações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => (
-                            <tr key={user.id} className="flex bg-white shadow-sm rounded mb-2">
-                                <td className="w-full p-3 font-bold rounded-l-md">{user.id}</td>
-                                <td className="w-full p-3 font-bold">{user.name}</td>
-                                <td className="w-full p-3 font-bold">{user.email}</td>
-                                <td className="w-full p-3 font-bold items-center justify-center rounded-r-md">
-                                    <div className="w-full flex gap-6 items-center justify-center">
+                            <tr key={user.id} className="flex bg-digital-blue-50/70 hover:bg-digital-blue-100/60 border border-border rounded-radius mb-2 text-darktext">
+                                <td className="w-full p-2 pl-4 font-medium rounded-l-radius">{user.id}</td>
+                                <td className="w-full p-2 font-medium">{user.name}</td>
+                                <td className="w-full p-2 font-medium">{user.email}</td>
+                                <td className="w-full p-2 font-medium items-center justify-center rounded-r-radius">
+                                    <div className="w-full flex gap-5 items-center justify-center">
                                         <button
-                                            className="text-xl text-[#030D29] hover:scale-120 transition duration-200 cursor-pointer"
+                                            className="text-xl text-digital-blue-900 hover:text-digital-blue-700 transition duration-200 cursor-pointer"
                                             onClick={() => handleAction(user, "view")}
+                                            title="Visualizar"
                                         >
-                                            <FontAwesomeIcon icon={faEye} />
+                                            <Eye size={20} />
                                         </button>
                                         <button 
-                                            className="text-xl text-[#030D29] hover:scale-120 transition duration-200 cursor-pointer"
+                                            className="text-xl text-digital-blue-900 hover:text-digital-blue-700 transition duration-200 cursor-pointer"
                                             onClick={() => handleAction(user, "edit")}
+                                            title="Editar"
                                         >
-                                            <FontAwesomeIcon icon={faPencil} />
+                                            <PencilLine size={20} />
                                         </button>
                                         <button 
-                                            className="text-xl text-[#030D29] hover:scale-120 transition duration-200 cursor-pointer"
+                                            className="text-xl text-error hover:text-red-500 transition duration-200 cursor-pointer"
                                             onClick={() => handleAction(user, "delete")}
+                                            title="Deletar"
                                         >
-                                            <FontAwesomeIcon icon={faTrashCan} />
+                                            <Trash size={20} />
                                         </button>
                                     </div>
                                 </td>

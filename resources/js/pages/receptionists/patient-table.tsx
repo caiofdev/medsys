@@ -8,30 +8,25 @@ import { useState, useEffect } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Tabela de Administradores',
-        href: '/admin-table',
+        title: 'Tabela de Pacientes',
+        href: '/patient-table',
     },
 ];
 
-interface User {
+interface Patient {
     id: number;
     name: string;
     email: string;
     cpf: string;
     phone: string;
-    photo: string | undefined;
-    birth_date: Date;
+    gender: string;
+    birth_date: string;
+    emergency_contact: string;
+    medical_history?: string;
 }
 
-interface Admin {
-    id: number;
-    is_master: boolean;
-    user_id: number;
-    user: User;
-}
-
-interface PaginatedAdmins {
-    data: Admin[];
+interface PaginatedPatients {
+    data: Patient[];
     current_page: number;
     last_page: number;
     per_page: number;
@@ -39,27 +34,28 @@ interface PaginatedAdmins {
     links: any[];
 }
 
-interface AdminTableProps {
-    admins: PaginatedAdmins;
+interface PatientTableProps {
+    patients: PaginatedPatients;
     filters: {
         search: string;
     };
     userRole: 'admin' | 'doctor' | 'receptionist' | 'patient';
 }
 
-export default function AdminTable({ admins, filters, userRole }: AdminTableProps) {
+export default function PatientTable({ patients, filters, userRole }: PatientTableProps) {
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
 
-    const tableData = admins.data.map(admin => ({
-        id: admin.id,
-        name: admin.user.name,
-        email: admin.user.email,
-        phone: admin.user.phone,
-        cpf: admin.user.cpf,
-        is_master: admin.is_master ? 'Sim' : 'Não',
-        photo: admin.user.photo ? `/storage/${admin.user.photo}` : undefined,
-        is_master_bool: admin.is_master,
-        birth_date: admin.user.birth_date ? new Date(admin.user.birth_date) : new Date(),
+    const tableData = patients.data.map(patient => ({
+        id: patient.id,
+        name: patient.name,
+        email: patient.email,
+        phone: patient.phone,
+        cpf: patient.cpf,
+        gender: patient.gender,
+        birth_date: patient.birth_date,
+        emergency_contact: patient.emergency_contact,
+        medical_history: patient.medical_history,
+        photo: undefined
     }));
 
     useEffect(() => {
@@ -69,7 +65,7 @@ export default function AdminTable({ admins, filters, userRole }: AdminTableProp
     useEffect(() => {
         if (searchTerm !== (filters?.search || '')) {
             const delayedSearch = setTimeout(() => {
-                router.get('/admin/admins', { search: searchTerm }, { 
+                router.get('/receptionist/patients', { search: searchTerm }, { 
                     preserveState: true,
                     preserveScroll: true 
                 });
@@ -81,24 +77,24 @@ export default function AdminTable({ admins, filters, userRole }: AdminTableProp
 
     return(
         <AppLayout breadcrumbs={breadcrumbs} userRole={userRole}>
-            <Head title="Admin Table" />
+            <Head title="Patient Table" />
             <div className="flex flex-col space-y-6 justify-center mt-5">
-                <div className='flex flex-row justify-between ml-30 mr-30'>
+                <div className='flex flex-row justify-between ml-25 mr-25 lg:ml-15 lg:mr-15'>
                     <SearchBox 
-                        placeHolder="Buscar por nome do administrador..." 
+                        placeHolder="Buscar por um paciente..." 
                         value={searchTerm}
                         onChange={setSearchTerm}
                     />
                 </div>
                 
-                <Table users={tableData} type={'admin'} />
+                <Table users={tableData} type='patient'/>
                 
                 <Pagination 
-                    links={admins.links}
-                    currentPage={admins.current_page}
-                    lastPage={admins.last_page}
-                    total={admins.total}
-                    perPage={admins.per_page}
+                    links={patients.links}
+                    currentPage={patients.current_page}
+                    lastPage={patients.last_page}
+                    total={patients.total}
+                    perPage={patients.per_page}
                 />
             </div>
         </AppLayout>

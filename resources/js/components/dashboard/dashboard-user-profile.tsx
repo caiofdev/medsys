@@ -1,5 +1,5 @@
 import { Avatar } from "@radix-ui/react-avatar";
-import { AvatarFallback, AvatarImage } from "./ui/avatar";
+import { AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useInitials } from "@/hooks/use-initials";
 
 type DashboardProfileProps = {
@@ -11,7 +11,7 @@ type DashboardProfileProps = {
 export default function DashboardProfile( { userName, imgPath, type}: DashboardProfileProps ) {
     const getInitials = useInitials();
     return (
-        <div className="flex flex-col col-span-1 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border" style={{ backgroundColor: '#F7F2EB' }}>
+        <div className="flex flex-col col-span-1 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-primary" style={{ backgroundColor: '#F7F2EB' }}>
             <div className='flex flex-col h-full'>
                 <div className='flex p-2 pl-3 rounded-xl' style={{ backgroundColor: '#030D29' }}>
                     <p className='text-xl text-white font-bold'>Meu Perfil</p>

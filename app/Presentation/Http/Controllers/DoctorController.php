@@ -42,7 +42,7 @@ class DoctorController extends Controller
         
         $doctors = $this->searchDoctor->execute($search, 8);
 
-        return Inertia::render('tables/doctor-table', [
+        return Inertia::render('doctors/doctor-table', [
             'doctors' => $doctors,
             'filters' => ['search' => $search],
             'userRole' => 'admin'
