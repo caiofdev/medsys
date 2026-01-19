@@ -28,7 +28,7 @@ class AdminControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => 
-            $page->component('tables/admin-table')
+            $page->component('admins/admin-table')
         );
     }
 
@@ -233,7 +233,7 @@ class AdminControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => 
-            $page->component('tables/admin-table')
+            $page->component('admins/admin-table')
                 ->has('admins.data', 1)
         );
     }
