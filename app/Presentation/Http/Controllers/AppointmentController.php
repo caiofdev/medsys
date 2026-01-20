@@ -91,18 +91,32 @@ class AppointmentController extends Controller
     public function getPatients(Request $request)
     {
         $query = $request->get('q', '');
-        
+
         if (!$query) {
-            return response()->json([
-                'success' => true,
-                'patients' => []
-            ]);
+            return response()->json(['success' => true, 'patients' => []]);
         }
 
-        $patients = $this->searchPatientForAutocomplete->execute($query);
+        $selectedDoctorId = $request->get('doctor_id');
+        if ($selectedDoctorId) {
+            $existingAppointment = Appointment::where('doctor_id', $selectedDoctorId)
+            ->where('appointment_date', '>=', Carbon::now())
+            ->where('status', '!=', 'canceled')
+            ->exists();
+
+            if ($existingAppointment) {
+            return response()->json(['success' => false, 'message' => 'This doctor has existing appointments.']);
+            }
+        }
+
+        $patients = Patient::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('cpf', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->select('id', 'name', 'cpf', 'email', 'phone')
+            ->limit(10)
+            ->get();
 
         return response()->json([
-            'success' => true,
+            'success'  => true,
             'patients' => $patients
         ]);
     }

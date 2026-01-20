@@ -48,6 +48,10 @@ class AdminController extends Controller
 
     public function store(AdminStoreRequest $request): RedirectResponse
     {
+        if ($request->input('is_master') === 'yes' && !auth()->user()->admin->is_master) {
+            abort(403, 'Apenas administradores Master podem criar outros Masters.');
+        }
+
         try {
             $this->createAdmin->execute($request->validated());
 

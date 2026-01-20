@@ -2,6 +2,7 @@
 
 namespace App\Presentation\Http\Controllers;
 
+use app\Domain\Models\Doctor;
 use App\Application\Actions\Doctor\CreateDoctor;
 use App\Application\Actions\Doctor\UpdateDoctor;
 use App\Application\Actions\Doctor\DeleteDoctor;

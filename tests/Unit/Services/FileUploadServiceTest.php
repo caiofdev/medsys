@@ -20,7 +20,7 @@ class FileUploadServiceTest extends TestCase
 
     public function test_can_upload_file(): void
     {
-        $file = UploadedFile::fake()->image('test.jpg');
+        $file = UploadedFile::fake()->create('test.jpg', 100);
 
         $path = $this->service->upload($file, 'photos');
 
@@ -30,7 +30,7 @@ class FileUploadServiceTest extends TestCase
 
     public function test_can_delete_existing_file(): void
     {
-        $file = UploadedFile::fake()->image('test.jpg');
+       $file = UploadedFile::fake()->create('test.jpg', 100);
         $path = $this->service->upload($file, 'photos');
 
         $deleted = $this->service->delete($path);
@@ -48,10 +48,10 @@ class FileUploadServiceTest extends TestCase
 
     public function test_can_update_file(): void
     {
-        $oldFile = UploadedFile::fake()->image('old.jpg');
+        $oldFile = UploadedFile::fake()->create('old.jpg', 100);
         $oldPath = $this->service->upload($oldFile, 'photos');
 
-        $newFile = UploadedFile::fake()->image('new.jpg');
+        $newFile = UploadedFile::fake()->create('new.jpg', 100);
 
         $newPath = $this->service->update($oldPath, $newFile, 'photos');
 
@@ -62,7 +62,7 @@ class FileUploadServiceTest extends TestCase
 
     public function test_can_update_file_when_no_old_file_exists(): void
     {
-        $newFile = UploadedFile::fake()->image('new.jpg');
+        $newFile = UploadedFile::fake()->create('new.jpg', 100);
 
         $newPath = $this->service->update(null, $newFile, 'photos');
 

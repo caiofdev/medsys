@@ -24,11 +24,11 @@ class AdminControllerTest extends TestCase
         $adminUser = User::factory()->create();
         $admin = Admin::factory()->create(['user_id' => $adminUser->id, 'is_master' => true]);
 
-        $response = $this->actingAs($adminUser)->get(route('admin.index'));
+        $response = $this->actingAs($adminUser)->get(route('admin.admins.index'));
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => 
-            $page->component('tables/admin-table')
+            $page->component('admins/admin-table')
         );
     }
 
@@ -49,7 +49,7 @@ class AdminControllerTest extends TestCase
             'is_master' => 'no',
         ];
 
-        $response = $this->actingAs($adminUser)->post(route('admin.store'), $data);
+        $response = $this->actingAs($adminUser)->post(route('admin.admins.store'), $data);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -69,19 +69,22 @@ class AdminControllerTest extends TestCase
         $adminUser = User::factory()->create();
         Admin::factory()->create(['user_id' => $adminUser->id, 'is_master' => true]);
 
-        $photo = UploadedFile::fake()->image('admin.jpg');
+        $photo = UploadedFile::fake()->create('admin.jpg', 100);
 
         $data = [
             'name' => 'Admin com Foto',
             'email' => 'comfoto@example.com',
             'cpf' => '12345678901',
+            'rg' => '123456789',
+            'phone' => '11987654321',
+            'birth_date' => '1990-01-01',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'is_master' => 'no',
             'photo' => $photo,
         ];
 
-        $response = $this->actingAs($adminUser)->post(route('admin.store'), $data);
+        $response = $this->actingAs($adminUser)->post(route('admin.admins.store'), $data);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -99,7 +102,7 @@ class AdminControllerTest extends TestCase
         $targetUser = User::factory()->create();
         $targetAdmin = Admin::factory()->create(['user_id' => $targetUser->id]);
 
-        $response = $this->actingAs($adminUser)->get(route('admin.show', $targetAdmin->id));
+        $response = $this->actingAs($adminUser)->get(route('admin.admins.show', $targetAdmin->id));
 
         $response->assertOk();
         $response->assertJson([
@@ -123,7 +126,7 @@ class AdminControllerTest extends TestCase
             'phone' => '11999999999',
         ];
 
-        $response = $this->actingAs($adminUser)->put(route('admin.update', $targetAdmin->id), $data);
+        $response = $this->actingAs($adminUser)->put(route('admin.admins.update', $targetAdmin->id), $data);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -137,23 +140,31 @@ class AdminControllerTest extends TestCase
 
     public function test_admin_can_update_admin_photo(): void
     {
+        Storage::fake('public');
+
         $adminUser = User::factory()->create();
         Admin::factory()->create(['user_id' => $adminUser->id, 'is_master' => true]);
 
-        $targetUser = User::factory()->create();
+        $targetUser = User::factory()->create(['photo' => null]);
         $targetAdmin = Admin::factory()->create(['user_id' => $targetUser->id]);
-
-        $newPhoto = UploadedFile::fake()->image('new-photo.jpg');
-
+        
+        $newPhoto = UploadedFile::fake()->create('admin.jpg', 100);
+        
         $data = [
             'name' => $targetUser->name,
             'email' => $targetUser->email,
+            'cpf' => '12345678900', 
+            'is_master' => 'no',    
+            'phone' => '11999999999',
             'photo' => $newPhoto,
         ];
 
-        $response = $this->actingAs($adminUser)->put(route('admin.update', $targetAdmin->id), $data);
+        $response = $this->actingAs($adminUser)
+            ->put(route('admin.admins.update', $targetAdmin->id), $data);
 
+        $response->assertSessionHasNoErrors(); 
         $response->assertRedirect();
+
         $targetUser->refresh();
         
         $this->assertNotNull($targetUser->photo);
@@ -168,7 +179,7 @@ class AdminControllerTest extends TestCase
         $targetUser = User::factory()->create();
         $targetAdmin = Admin::factory()->create(['user_id' => $targetUser->id, 'is_master' => false]);
 
-        $response = $this->actingAs($adminUser)->delete(route('admin.destroy', $targetAdmin->id));
+        $response = $this->actingAs($adminUser)->delete(route('admin.admins.destroy', $targetAdmin->id));
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -182,7 +193,7 @@ class AdminControllerTest extends TestCase
         $adminUser = User::factory()->create();
         $admin = Admin::factory()->create(['user_id' => $adminUser->id, 'is_master' => true]);
 
-        $response = $this->actingAs($adminUser)->delete(route('admin.destroy', $admin->id));
+        $response = $this->actingAs($adminUser)->delete(route('admin.admins.destroy', $admin->id));
 
         $response->assertRedirect();
         $response->assertSessionHasErrors();
@@ -199,7 +210,7 @@ class AdminControllerTest extends TestCase
         $adminUser2 = User::factory()->create();
         $admin2 = Admin::factory()->create(['user_id' => $adminUser2->id, 'is_master' => true]);
 
-        $response = $this->actingAs($adminUser1)->delete(route('admin.destroy', $admin2->id));
+        $response = $this->actingAs($adminUser1)->delete(route('admin.admins.destroy', $admin2->id));
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -218,19 +229,19 @@ class AdminControllerTest extends TestCase
         Admin::factory()->create(['user_id' => $user1->id]);
         Admin::factory()->create(['user_id' => $user2->id]);
 
-        $response = $this->actingAs($adminUser)->get(route('admin.index', ['search' => 'João']));
+        $response = $this->actingAs($adminUser)->get(route('admin.admins.index', ['search' => 'João']));
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => 
-            $page->component('tables/admin-table')
+            $page->component('admins/admin-table')
                 ->has('admins.data', 1)
         );
     }
 
     public function test_guest_cannot_access_admin_routes(): void
     {
-        $this->get(route('admin.index'))->assertRedirect(route('login'));
-        $this->post(route('admin.store'), [])->assertRedirect(route('login'));
+        $this->get(route('admin.admins.index'))->assertRedirect(route('login'));
+        $this->post(route('admin.admins.store'), [])->assertRedirect(route('login'));
     }
 
     public function test_validates_required_fields_on_create(): void
@@ -238,7 +249,7 @@ class AdminControllerTest extends TestCase
         $adminUser = User::factory()->create();
         Admin::factory()->create(['user_id' => $adminUser->id, 'is_master' => true]);
 
-        $response = $this->actingAs($adminUser)->post(route('admin.store'), []);
+        $response = $this->actingAs($adminUser)->post(route('admin.admins.store'), []);
 
         $response->assertSessionHasErrors(['name', 'email', 'cpf', 'password']);
     }
@@ -250,7 +261,7 @@ class AdminControllerTest extends TestCase
 
         $existingUser = User::factory()->create(['email' => 'existing@example.com']);
 
-        $response = $this->actingAs($adminUser)->post(route('admin.store'), [
+        $response = $this->actingAs($adminUser)->post(route('admin.admins.store'), [
             'name' => 'Novo Admin',
             'email' => 'existing@example.com',
             'cpf' => '12345678901',
@@ -267,15 +278,68 @@ class AdminControllerTest extends TestCase
         $adminUser = User::factory()->create();
         Admin::factory()->create(['user_id' => $adminUser->id, 'is_master' => true]);
 
-        $response = $this->actingAs($adminUser)->post(route('admin.store'), [
+        $response = $this->actingAs($adminUser)->post(route('admin.admins.store'), [
             'name' => 'Novo Admin',
             'email' => 'novo@example.com',
             'cpf' => '12345678901',
+            'birth_date' => '1990-01-01',
             'password' => 'password123',
+            'phone' => '11999999999',
             'password_confirmation' => 'differentpassword',
             'is_master' => 'no',
         ]);
 
         $response->assertSessionHasErrors(['password']);
+    }
+
+    public function test_validates_unique_email_on_update_ignoring_own_id(): void
+    {
+        $adminUser = User::factory()->create();
+        Admin::factory()->create(['user_id' => $adminUser->id, 'is_master' => true]);
+
+        $otherUser = User::factory()->create(['email' => 'other@example.com']);
+        
+        $response = $this->actingAs($adminUser)
+            ->put(route('admin.admins.update', $adminUser->id), [ 
+                'name' => 'Updated Name',
+                'email' => 'other@example.com', 
+                'phone' => '11999999999',
+                'is_master' => 'yes'
+            ]);
+
+        $response->assertSessionHasErrors(['email']);
+
+        $response2 = $this->actingAs($adminUser)
+            ->put(route('admin.admins.update', $adminUser->id), [
+                'name' => 'Updated Name',
+                'email' => $adminUser->email, 
+                'phone' => '11999999999',
+                'is_master' => 'yes'
+            ]);
+            
+        $response2->assertSessionHasNoErrors();
+    }
+
+
+    public function test_non_master_admin_cannot_create_master_admin(): void
+    {
+        $commonUser = User::factory()->create();
+        Admin::factory()->create(['user_id' => $commonUser->id, 'is_master' => false]);
+
+        $data = [
+            'name' => 'Tentativa Master',
+            'email' => 'hacker@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'birth_date' => '1990-01-01',
+            'phone' => '11999999999',
+            'cpf' => '12345678900',
+            'is_master' => 'yes', 
+        ];
+
+        $response = $this->actingAs($commonUser)->post(route('admin.admins.store'), $data);
+
+
+        $response->assertForbidden(); 
     }
 }
