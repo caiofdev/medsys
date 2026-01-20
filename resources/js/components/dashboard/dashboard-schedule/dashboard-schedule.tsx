@@ -1,7 +1,7 @@
-import { Plus } from 'lucide-react';
+// import { Plus } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Scrollbar, Mousewheel } from 'swiper/modules';
-import { router } from '@inertiajs/react';
+// import { router } from '@inertiajs/react';
 import 'swiper/css';
 import 'swiper/css/scrollbar';
 import DashboardScheduleEvent from './dashboard-schedule-event';
@@ -43,12 +43,12 @@ return (
          Agenda
       </div>
 
-      <div
+      {/* <div
          className="bg-digital-blue-100 rounded-full h-fit w-fit p-1 cursor-pointer hover:bg-digital-blue-200"
          onClick={() => router.visit('/calendar')}
       >
          <Plus />
-      </div>
+      </div> */}
       </div>
 
       <Swiper
