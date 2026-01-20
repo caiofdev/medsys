@@ -1,6 +1,4 @@
 <?php
-// filepath: app/Application/Actions/Dashboard/GetReceptionistDashboardData.php
-
 namespace App\Application\Actions\Dashboard;
 
 use App\Domain\Contracts\DashboardRepositoryInterface;
@@ -27,6 +25,8 @@ class GetReceptionistDashboardData
 
         $weeklyAppointments = $this->dashboardRepository->getWeeklyAppointments();
 
+        $patients = $this->dashboardRepository->getPatients(null);
+
         return [
             'user' => [
                 'name' => $user->name,
@@ -36,6 +36,7 @@ class GetReceptionistDashboardData
             ],
             'daily_summary' => $dailySummary,
             'weekly_appointments' => $weeklyAppointments,
+            'patients' => $patients
         ];
     }
 }

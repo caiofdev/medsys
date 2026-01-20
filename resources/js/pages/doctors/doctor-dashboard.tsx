@@ -42,6 +42,8 @@ interface DoctorDashboardProps {
         name: string;
         birth_date: string;
         email: string;
+        cpf: string;
+        phone: string;
     }>;
     consultations_summary: {
         today: number;

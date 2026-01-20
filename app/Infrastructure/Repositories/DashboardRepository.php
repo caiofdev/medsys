@@ -219,11 +219,18 @@ class DashboardRepository implements DashboardRepositoryInterface
             $query->whereHas('appointments', function($q) use ($doctorId) {
                 $q->where('doctor_id', $doctorId);
             });
-        } else {
-            $query->whereHas('appointments');
         }
     
-        return $query->get(['id', 'name', 'birth_date', 'email'])->toArray();
+        return $query->get()->map(function($patient) {
+            return [
+                'id' => $patient->id,
+                'name' => $patient->name,
+                'birth_date' => (string) $patient->birth_date,
+                'email' => $patient->email,
+                'cpf' => $patient->cpf,
+                'phone' => $patient->phone,
+            ];
+        })->toArray();
     }
 
     public function getDoctorConsultationsSummary(int $doctorId): array

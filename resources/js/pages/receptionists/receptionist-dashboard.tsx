@@ -21,7 +21,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface ReceptionistDashboardProps {
     user: User;
-    patients: User[];
+    patients: {
+        id: number;
+        name: string;
+        birth_date: string;
+        email: string;
+        cpf: string;
+        phone: string;
+    }[]
     doctors: User[];
     daily_summary: {
         appointments_today: number;
@@ -44,14 +51,18 @@ interface ReceptionistDashboardProps {
     }>;
 }
 
-export default function ReceptionistDashboard({ user, daily_summary, weekly_appointments, patients, doctors }: ReceptionistDashboardProps) {
+export default function ReceptionistDashboard({ user, weekly_appointments, patients, doctors }: ReceptionistDashboardProps) {
     const [open, setOpen] = useState(false);
+
+    const completedCount = weekly_appointments.filter(a => a.status === 'completed').length;
+    const scheduledCount = weekly_appointments.filter(a => a.status === 'scheduled').length;
+    const canceledCount = weekly_appointments.filter(a => a.status === 'canceled').length;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs} userRole="receptionist">
             <Head title="Recepcionist Dashboard" />
-            <div className="flex h-full flex-1 gap-6 rounded-xl p-6 pr-10 pl-10 overflow-x-auto">
-                {/* Coluna principal à esquerda */}
-                <div className="gap-4 grid grid-cols-1 lg:grid-cols-[1fr_330px] ">
+            <div className="flex h-full flex-1 gap-6 rounded-xl p-6 pr-10 pl-10 overflow-x-auto w-full">
+                <div className="gap-4 grid grid-cols-1 lg:grid-cols-[1fr_330px] min-h-screen p-4 md:p-0 w-full">
                     <div className='flex flex-col gap-4'>
                         <DashboardHeader userName={user.name} />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 h-fit">
@@ -67,8 +78,13 @@ export default function ReceptionistDashboard({ user, daily_summary, weekly_appo
                                 onClick={() => setOpen(true)}
                             />
                         </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                            <StatusAppointmentsSummary title="Status das Consultas da Semana" completed={daily_summary.completed_today} scheduled={daily_summary.appointments_today} canceled={daily_summary.cancelled_today} />
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                            <StatusAppointmentsSummary
+                                title="Status das Consultas da Semana"
+                                completed={completedCount}
+                                scheduled={scheduledCount}
+                                canceled={canceledCount}
+                            />
                             <DashboardSchedule events={weekly_appointments
                                 .filter(appointment => appointment.status !== 'canceled' )
                                 .map(appointment => ({
@@ -80,18 +96,11 @@ export default function ReceptionistDashboard({ user, daily_summary, weekly_appo
                             } />
                         </div>
                     </div>
-                    {/* Coluna fixa à direita */}
-                    <div>
+                    <div className='ml-auto'>
                         <DashboardPatientsList 
                             isDoctors={false}
                             title='Pacientes'
-                            patients={[
-                                { name: 'Lucas Ferreira', birth_date: '1990-05-15', email: 'lucas.ferreira@example.com' },
-                                { name: 'Mariana Silva', birth_date: '1985-08-22', email: 'mariana.silva@example.com' },
-                                { name: 'Pedro Gomes', birth_date: '1978-11-30', email: 'pedro.gomes@example.com' },
-                                { name: 'Ana Costa', birth_date: '1992-03-10', email: 'ana.costa@example.com' },
-                                { name: 'Rafael Souza', birth_date: '1988-07-25', email: 'rafael.souza@example.com' },
-                            ]} 
+                            patients={patients}  
                         />
                     </div>
                 </div>

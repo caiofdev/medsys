@@ -13,7 +13,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface Patient {
+export interface Patient {
     id: number;
     name: string;
     email: string;

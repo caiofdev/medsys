@@ -108,7 +108,7 @@ export interface User {
     email: string
     cpf: string
     phone: string
-    photo: string | undefined;
+    photo?: string | undefined;
     is_master?: string
     medical_history?: string
     birth_date?: Date | string
