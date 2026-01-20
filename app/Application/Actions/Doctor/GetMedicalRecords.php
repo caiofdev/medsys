@@ -23,9 +23,12 @@ class GetMedicalRecords
         $patients = $this->doctorRepository->getPatientsWithConsultations($doctorId);
         
         $consultationData = [];
-        foreach ($patients as $patient) {
-            $consultations = $this->doctorRepository->getPatientConsultations($doctorId, $patient->patient->id);
-            
+        foreach ($patients as $item) { 
+            if (!$item->patient) {
+                continue; 
+            }
+
+            $consultations = $this->doctorRepository->getPatientConsultations($doctorId, $item->patient->id);
             foreach ($consultations as $consultation) {
                 $consultationData[] = [
                     'id' => $consultation->id,

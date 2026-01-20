@@ -2,7 +2,10 @@
 
 namespace App\Presentation\Http\Controllers;
 
-use app\Domain\Models\Doctor;
+use App\Domain\Models\Appointment;
+use App\Domain\Models\Doctor;
+use App\Domain\Models\Patient;
+
 use App\Application\Actions\Doctor\CreateDoctor;
 use App\Application\Actions\Doctor\UpdateDoctor;
 use App\Application\Actions\Doctor\DeleteDoctor;
@@ -159,7 +162,7 @@ class DoctorController extends Controller
 
     public function medicalRecords(): Response
     {
-        try {
+        // try {
             $user = auth()->user();
             $doctor = $user->doctor;
 
@@ -176,9 +179,9 @@ class DoctorController extends Controller
                 'userRole' => 'doctor',
             ]);
 
-        } catch (\Exception $e) {
-            abort(500, 'Erro ao carregar prontuários: ' . $e->getMessage());
-        }
+        // } catch (\Exception $e) {
+        //     abort(500, 'Erro ao carregar prontuários: ' . $e->getMessage());
+        // }
     }
 
     public function showMedicalRecord(int $patientId): Response
