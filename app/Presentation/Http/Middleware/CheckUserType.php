@@ -21,25 +21,18 @@ class CheckUserType
 
         $user = auth()->user();
         
-        // OTIMIZAÇÃO CRÍTICA: Cachear tipo de usuário na sessão
         $userType = session()->remember('user_type', function() use ($user) {
-            // Eager load todas as relações de uma vez
             $user->load(['admin', 'doctor', 'receptionist']);
             return $user->getUserType();
         });
 
-        // Verificar se o tipo do usuário está na lista de tipos permitidos
         if (!in_array($userType, $types)) {
-            // Redirecionar para a dashboard apropriada baseada no tipo do usuário
             return redirect()->route($this->getRedirectRoute($userType));
         }
 
         return $next($request);
     }
 
-    /**
-     * Obter a rota de redirecionamento baseada no tipo de usuário
-     */
     private function getRedirectRoute(string $userType): string
     {
         return match($userType) {
