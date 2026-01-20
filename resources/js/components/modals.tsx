@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode, useRef } from "react"
+import { useState, useEffect, createContext, useContext, ReactNode, useRef, use } from "react"
 import { useInitials } from '@/hooks/use-initials';
 import { InputField } from "./input-field";
 import { SelectField } from "./select-field";
@@ -194,6 +194,9 @@ interface ModalContextType {
     resetFormData: () => void;
     resetAppointmentData: () => void;
     initializeEditMode: (user: User) => void;
+
+    scheduleStatus: string;
+    setScheduleStatus: (value: string) => void;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -202,7 +205,8 @@ function ModalProvider({ children }: { children: ReactNode }) {
     const [preview, setPreview] = useState("");
     const [gender, setGender] = useState("Selecione o gênero");
     const [is_master, setIsMaster] = useState("Selecione a opção");
-    
+    const [scheduleStatus, setScheduleStatus] = useState("");
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -348,12 +352,14 @@ function ModalProvider({ children }: { children: ReactNode }) {
         }, {
             onSuccess: (page) => {
                 console.log('Sucesso:', page);
-                alert(`Consulta agendada com sucesso para ${appointmentFormData.patient.name} com ${appointmentFormData.doctor.name}`);
+                setScheduleStatus((`Consulta agendada com sucesso para ${appointmentFormData.patient.name} com ${appointmentFormData.doctor.name}`));
                 resetAppointmentData();
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             },
             onError: (errors) => {
-                console.error('Erro:', errors);
+                setScheduleStatus((`Erro ao agendar consulta para ${appointmentFormData.patient.name} com ${appointmentFormData.doctor.name}`));
                 
                 // Verifica se há uma mensagem de erro específica
                 if (errors.message) {
@@ -535,6 +541,8 @@ function ModalProvider({ children }: { children: ReactNode }) {
         resetFormData,
         resetAppointmentData,
         initializeEditMode,
+        scheduleStatus,
+        setScheduleStatus,
     };
     
     return (
@@ -1183,6 +1191,7 @@ function ModalAppointment({ receptionist, patients, doctors }: { receptionist: U
         resetAppointmentData,
         searchPatients,
         searchDoctors,
+        scheduleStatus,
     } = useModal();
 
     const formatPrice = (price: number): string => {
@@ -1211,6 +1220,15 @@ function ModalAppointment({ receptionist, patients, doctors }: { receptionist: U
                 <DialogTitle className="text-white text-center p-2">Agendar Consulta</DialogTitle>
                 <DialogDescription className="max-h-[86vh] bg-white-50 p-4 rounded-b-2xl space-y-4 text-darktext overflow-y-auto flex-1 custom-scrollbar flex-col">
                     <div className="flex flex-col gap-3">
+                        {scheduleStatus && (
+                            <div className={
+                                scheduleStatus.startsWith('Consulta agendada')
+                                    ? 'bg-green-100 border border-green-300 text-green-800 rounded p-3 mb-3 text-center'
+                                    : 'bg-red-100 border border-red-300 text-red-800 rounded p-3 mb-3 text-center'
+                            }>
+                                {scheduleStatus}
+                            </div>
+                        )}
                         <div className="relative">
                             <InputField
                                 name="patient"
